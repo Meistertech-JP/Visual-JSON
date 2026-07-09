@@ -1,0 +1,15 @@
+<!-- SPDX-License-Identifier: MPL-2.0 -->
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/VisualJson.App/VisualJson.App.vbproj" />
+    <Project Path="src/VisualJson.Core/VisualJson.Core.vbproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/VisualJson.Tests/VisualJson.Tests.vbproj" />
+  </Folder>
+  <Folder Name="/tools/">
+    <Project Path="tools/VisualJson.Benchmarks/VisualJson.Benchmarks.vbproj" />
+    <Project Path="tools/VisualJson.Phase2Acceptance/VisualJson.Phase2Acceptance.vbproj" />
+    <Project Path="tools/VisualJson.Phase2Spikes/VisualJson.Phase2Spikes.vbproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,19 @@
+<!-- SPDX-License-Identifier: MPL-2.0 -->
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>VisualJson.Phase2Acceptance</RootNamespace>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <OptionStrict>On</OptionStrict>
+    <OptionExplicit>On</OptionExplicit>
+    <OptionInfer>On</OptionInfer>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\VisualJson.App\VisualJson.App.vbproj" />
+    <ProjectReference Include="..\..\src\VisualJson.Core\VisualJson.Core.vbproj" />
+  </ItemGroup>
+
+</Project>

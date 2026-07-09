@@ -1,0 +1,375 @@
+<!-- SPDX-License-Identifier: MPL-2.0 -->
+<Window x:Class="MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:VisualJson.App"
+        xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit"
+        mc:Ignorable="d"
+        Title="Visual JSON" Height="760" Width="1180" MinHeight="600" MinWidth="920"
+        Loaded="Window_Loaded"
+        Closing="Window_Closing"
+        KeyDown="Window_KeyDown"
+        AllowDrop="True"
+        DragOver="Window_DragOver"
+        Drop="Window_Drop">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <Style x:Key="ToolbarButton" TargetType="{x:Type Button}">
+            <Setter Property="Margin" Value="3,0"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="MinWidth" Value="72"/>
+        </Style>
+        <Style x:Key="HeaderText" TargetType="{x:Type TextBlock}">
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#3F3F46"/>
+            <Setter Property="Margin" Value="4,0"/>
+        </Style>
+        <Style TargetType="{x:Type TextBox}">
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="170"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Menu Grid.Row="0">
+            <MenuItem x:Name="FileMenu" Header="_File">
+                <MenuItem x:Name="NewMenuItem" Header="_New" InputGestureText="Ctrl+N" Click="New_Click"/>
+                <MenuItem x:Name="OpenMenuItem" Header="_Open..." InputGestureText="Ctrl+O" Click="Open_Click"/>
+                <MenuItem x:Name="RecentFilesMenuItem" Header="_Recent"/>
+                <Separator/>
+                <MenuItem x:Name="SaveMenuItem" Header="_Save" InputGestureText="Ctrl+S" Click="Save_Click"/>
+                <MenuItem x:Name="SaveAsMenuItem" Header="Save _As..." InputGestureText="Ctrl+Shift+S" Click="SaveAs_Click"/>
+                <Separator/>
+                <MenuItem x:Name="RecoverMenuItem" Header="_Recover Latest Snapshot" Click="RecoverLatest_Click"/>
+                <MenuItem x:Name="SettingsMenuItem" Header="S_ettings..." Click="Settings_Click"/>
+                <Separator/>
+                <MenuItem x:Name="ExitMenuItem" Header="E_xit" Click="Exit_Click"/>
+            </MenuItem>
+            <MenuItem x:Name="EditMenu" Header="_Edit">
+                <MenuItem x:Name="ValidateMenuItem" Header="_Validate and Sync Text to Grid" InputGestureText="F5" Click="ValidateSync_Click"/>
+                <MenuItem x:Name="ApplyGridMenuItem" Header="_Apply Grid to Text" Click="ApplyGridToText_Click"/>
+                <MenuItem x:Name="FormatMenuItem" Header="_Format JSON" InputGestureText="Ctrl+Shift+F" Click="Format_Click"/>
+                <MenuItem x:Name="UndoGridMenuItem" Header="_Undo Grid Operation" InputGestureText="Ctrl+Z" Click="UndoGrid_Click"/>
+                <MenuItem x:Name="RedoGridMenuItem" Header="_Redo Grid Operation" InputGestureText="Ctrl+Y" Click="RedoGrid_Click"/>
+                <Separator/>
+                <MenuItem x:Name="FindNextMenuItem" Header="_Find Next" InputGestureText="Enter in search" Click="FindNext_Click"/>
+                <MenuItem x:Name="ReplaceMenuItem" Header="_Replace" InputGestureText="Ctrl+H" Click="ReplaceFocus_Click"/>
+            </MenuItem>
+            <MenuItem x:Name="ViewMenu" Header="_View">
+                <MenuItem x:Name="TextModeMenuItem" Header="_Text Mode" InputGestureText="Ctrl+T" Click="TextMode_Click"/>
+                <MenuItem x:Name="GridModeMenuItem" Header="_Grid Mode" InputGestureText="Ctrl+G" Click="GridMode_Click"/>
+            </MenuItem>
+            <MenuItem x:Name="SchemaMenu" Header="_Schema">
+                <MenuItem x:Name="LoadSchemaMenuItem" Header="_Load Local Schema..." Click="LoadSchema_Click"/>
+                <MenuItem x:Name="LoadSchemaFromUrlMenuItem" Header="Load Schema from $schema _URL..." Click="LoadSchemaFromUrl_Click"/>
+                <MenuItem x:Name="ClearSchemaMenuItem" Header="_Clear Schema" Click="ClearSchema_Click"/>
+                <Separator/>
+                <MenuItem x:Name="ValidateSchemaMenuItem" Header="_Validate with Schema" Click="ValidateSchema_Click"/>
+                <Separator/>
+                <MenuItem x:Name="AllowExternalSchemaMenuItem" Header="Allow _External HTTPS Schema (off by default)" IsCheckable="True" IsChecked="False"/>
+            </MenuItem>
+            <MenuItem x:Name="ConvertMenu" Header="_Convert">
+                <MenuItem x:Name="ExportXmlMenuItem" Header="Export as _XML..." Click="ExportXml_Click"/>
+                <MenuItem x:Name="ExportYamlMenuItem" Header="Export as _YAML..." Click="ExportYaml_Click"/>
+                <Separator/>
+                <MenuItem x:Name="ImportXmlMenuItem" Header="Open XML as _JSON..." Click="ImportXml_Click"/>
+                <MenuItem x:Name="ImportYamlMenuItem" Header="Open YAML as JS_ON..." Click="ImportYaml_Click"/>
+            </MenuItem>
+            <MenuItem x:Name="HelpMenu" Header="_Help">
+                <MenuItem x:Name="CopyDiagnosticsMenuItem" Header="_Copy Diagnostics" Click="CopyDiagnostics_Click"/>
+                <MenuItem x:Name="AboutMenuItem" Header="_About Visual JSON" Click="About_Click"/>
+            </MenuItem>
+        </Menu>
+
+        <Border Grid.Row="1" BorderBrush="#D4D4D8" BorderThickness="0,0,0,1" Background="#F4F4F5" Padding="8">
+            <DockPanel LastChildFill="False">
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                    <Button x:Name="NewButton" Style="{StaticResource ToolbarButton}" Content="New" Click="New_Click"/>
+                    <Button x:Name="OpenButton" Style="{StaticResource ToolbarButton}" Content="Open" Click="Open_Click"/>
+                    <Button x:Name="SaveButton" Style="{StaticResource ToolbarButton}" Content="Save" Click="Save_Click"/>
+                    <Button x:Name="SaveAsButton" Style="{StaticResource ToolbarButton}" Content="Save As" Click="SaveAs_Click"/>
+                    <Button x:Name="ValidateButton" Style="{StaticResource ToolbarButton}" Content="Validate" Click="ValidateSync_Click"/>
+                    <Button x:Name="FormatButton" Style="{StaticResource ToolbarButton}" Content="Format" Click="Format_Click"/>
+                    <Button x:Name="ApplyGridButton" Style="{StaticResource ToolbarButton}" Content="Apply Grid" Click="ApplyGridToText_Click"/>
+                    <Button x:Name="UndoGridButton" Style="{StaticResource ToolbarButton}" Content="Undo" Click="UndoGrid_Click"/>
+                    <Button x:Name="RedoGridButton" Style="{StaticResource ToolbarButton}" Content="Redo" Click="RedoGrid_Click"/>
+                    <Button x:Name="DiagnosticsButton" Style="{StaticResource ToolbarButton}" Content="Diagnostics" Click="CopyDiagnostics_Click"/>
+                    <TextBlock x:Name="LanguageLabel" Text="Language" VerticalAlignment="Center" Margin="12,0,4,0"/>
+                    <ComboBox x:Name="LanguageCombo" Width="84" SelectionChanged="LanguageCombo_SelectionChanged" SelectedIndex="0">
+                        <ComboBoxItem Tag="en" Content="English"/>
+                        <ComboBoxItem Tag="ja" Content="日本語"/>
+                    </ComboBox>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <TabControl Grid.Row="2" x:Name="EditorTabs" Margin="8" SelectionChanged="EditorTabs_SelectionChanged">
+            <TabItem x:Name="TextTab" Header="Text">
+                <DockPanel>
+                    <Border DockPanel.Dock="Top" BorderBrush="#E4E4E7" BorderThickness="0,0,0,1" Padding="6" Background="#FAFAFA">
+                        <WrapPanel VerticalAlignment="Center">
+                            <TextBlock x:Name="FindLabel" Text="Find" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <TextBox x:Name="SearchBox" Width="180" TextChanged="SearchBox_TextChanged"/>
+                            <Button x:Name="FindPrevButton" Content="Prev" Width="62" Margin="6,0,0,0" Click="FindPrevious_Click"/>
+                            <Button x:Name="FindNextButton" Content="Next" Width="62" Margin="4,0,0,0" Click="FindNext_Click"/>
+                            <TextBlock x:Name="ReplaceLabel" Text="Replace" VerticalAlignment="Center" Margin="14,0,8,0"/>
+                            <TextBox x:Name="ReplaceBox" Width="180"/>
+                            <Button x:Name="ReplaceButton" Content="Replace" Width="82" Margin="6,0,0,0" Click="Replace_Click"/>
+                            <Button x:Name="ReplaceAllButton" Content="All" Width="62" Margin="4,0,0,0" Click="ReplaceAll_Click"/>
+                            <CheckBox x:Name="CaseSensitiveBox" Content="Aa" VerticalAlignment="Center" Margin="10,0,0,0" Checked="SearchOptions_Changed" Unchecked="SearchOptions_Changed"/>
+                            <CheckBox x:Name="RegexSearchBox" Content=".*" VerticalAlignment="Center" Margin="8,0,0,0" Checked="SearchOptions_Changed" Unchecked="SearchOptions_Changed"/>
+                            <CheckBox x:Name="AutoPairBox" Content="Pairs" IsChecked="True" VerticalAlignment="Center" Margin="8,0,0,0" Checked="AutoPairBox_Changed" Unchecked="AutoPairBox_Changed"/>
+                            <TextBlock x:Name="SearchCountText" Text="" VerticalAlignment="Center" Foreground="#52525B" Margin="10,0,0,0"/>
+                        </WrapPanel>
+                    </Border>
+                    <avalonedit:TextEditor x:Name="JsonEditor"
+                                           BorderThickness="0"
+                                           FontFamily="Consolas"
+                                           FontSize="14"
+                                           ShowLineNumbers="True"
+                                           LineNumbersForeground="#71717A"
+                                           HorizontalScrollBarVisibility="Auto"
+                                           VerticalScrollBarVisibility="Auto"
+                                           Padding="8"/>
+                </DockPanel>
+            </TabItem>
+
+            <TabItem x:Name="GridTab" Header="Grid">
+                <Grid>
+                <DockPanel x:Name="GridTreePanel">
+                    <StackPanel DockPanel.Dock="Top">
+                        <Border Background="#FAFAFA" BorderBrush="#E4E4E7" BorderThickness="0,0,0,1" Padding="6">
+                            <DockPanel LastChildFill="True">
+                                <TextBlock x:Name="GridFilterLabel" Text="Filter" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <Button x:Name="ClearFilterButton" DockPanel.Dock="Right" Width="82" Content="Clear" Margin="6,0,0,0" Click="ClearFilter_Click"/>
+                                <TextBox x:Name="GridFilterBox" TextChanged="GridFilterBox_TextChanged"/>
+                            </DockPanel>
+                        </Border>
+                        <Border Background="#FAFAFA" BorderBrush="#E4E4E7" BorderThickness="0,0,0,1" Padding="8">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="42"/>
+                                    <ColumnDefinition Width="220"/>
+                                    <ColumnDefinition Width="300"/>
+                                    <ColumnDefinition Width="110"/>
+                                    <ColumnDefinition Width="220"/>
+                                    <ColumnDefinition Width="320"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock x:Name="GripHeader" Grid.Column="0" Style="{StaticResource HeaderText}" Text="Grip"/>
+                                <TextBlock x:Name="KeyHeader" Grid.Column="1" Style="{StaticResource HeaderText}" Text="Key"/>
+                                <TextBlock x:Name="ValueHeader" Grid.Column="2" Style="{StaticResource HeaderText}" Text="Value"/>
+                                <TextBlock x:Name="TypeHeader" Grid.Column="3" Style="{StaticResource HeaderText}" Text="Type"/>
+                                <TextBlock x:Name="PathHeader" Grid.Column="4" Style="{StaticResource HeaderText}" Text="Path"/>
+                                <TextBlock x:Name="ActionHeader" Grid.Column="5" Style="{StaticResource HeaderText}" Text="Action"/>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+
+                    <TreeView x:Name="JsonTree"
+                              BorderThickness="0"
+                              AllowDrop="True"
+                              SelectedItemChanged="JsonTree_SelectedItemChanged"
+                              PreviewMouseMove="JsonTree_PreviewMouseMove"
+                              Drop="JsonTree_Drop"
+                              VirtualizingStackPanel.IsVirtualizing="True"
+                              VirtualizingStackPanel.VirtualizationMode="Recycling">
+                        <TreeView.ItemContainerStyle>
+                            <Style TargetType="{x:Type TreeViewItem}">
+                                <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+                                <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
+                                <EventSetter Event="PreviewMouseRightButtonDown" Handler="TreeViewItem_PreviewMouseRightButtonDown"/>
+                                <EventSetter Event="ContextMenuOpening" Handler="TreeViewItem_ContextMenuOpening"/>
+                            </Style>
+                        </TreeView.ItemContainerStyle>
+                        <TreeView.ItemTemplate>
+                            <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                                <Grid MinHeight="30" Margin="0,1,0,1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="38"/>
+                                        <ColumnDefinition Width="210"/>
+                                        <ColumnDefinition Width="300"/>
+                                        <ColumnDefinition Width="100"/>
+                                        <ColumnDefinition Width="220"/>
+                                        <ColumnDefinition Width="320"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Button Grid.Column="0"
+                                            Content="::"
+                                            Padding="2"
+                                            Tag="{Binding Model}"
+                                            PreviewMouseLeftButtonDown="Grip_PreviewMouseLeftButtonDown"
+                                            ToolTip="{Binding DragGripToolTipText, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
+                                    <TextBox Grid.Column="1"
+                                             Text="{Binding Model.Key, UpdateSourceTrigger=PropertyChanged}"
+                                             IsEnabled="{Binding Model.CanEditKey}"
+                                             ToolTip="{Binding Model.DisplayPath}"
+                                             Margin="0,0,4,0"
+                                             Padding="6,2"
+                                             GotKeyboardFocus="GridCell_GotKeyboardFocus"
+                                             KeyDown="GridCell_KeyDown"
+                                             MouseDoubleClick="GridCell_MouseDoubleClick"/>
+                                    <TextBox Grid.Column="2"
+                                             Text="{Binding Model.ValueText, UpdateSourceTrigger=PropertyChanged}"
+                                             IsEnabled="{Binding Model.CanEditValue}"
+                                             Margin="4,0"
+                                             Padding="6,2"
+                                             GotKeyboardFocus="GridCell_GotKeyboardFocus"
+                                             KeyDown="GridCell_KeyDown"
+                                             MouseDoubleClick="GridCell_MouseDoubleClick"/>
+                                    <TextBlock Grid.Column="3"
+                                               Text="{Binding Model.TypeName}"
+                                               VerticalAlignment="Center"
+                                               Foreground="#52525B"
+                                               Margin="4,0"/>
+                                    <TextBlock Grid.Column="4"
+                                               Text="{Binding Model.PointerDisplay}"
+                                               ToolTip="{Binding Model.DisplayPath}"
+                                               VerticalAlignment="Center"
+                                               Foreground="#71717A"
+                                               TextTrimming="CharacterEllipsis"
+                                               Margin="4,0"/>
+                                    <StackPanel Grid.Column="5" Orientation="Horizontal">
+                                        <Button Content="{Binding TableActionText, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                                Padding="5,2" Margin="2,0" Click="OpenTable_Click"
+                                                Visibility="{Binding IsTableCandidate, Converter={StaticResource BoolToVis}}"/>
+                                        <Button Content="{Binding AddChildActionText, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Padding="5,2" Margin="2,0" Click="AddChild_Click"/>
+                                        <Button Content="{Binding AddSiblingActionText, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Padding="5,2" Margin="2,0" Click="AddSibling_Click"/>
+                                        <Button Content="{Binding DeleteActionText, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Padding="5,2" Margin="2,0" Click="DeleteNode_Click"/>
+                                        <Button Content="{Binding MoveUpActionText, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Padding="5,2" Margin="2,0" Click="MoveUp_Click"/>
+                                        <Button Content="{Binding MoveDownActionText, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Padding="5,2" Margin="2,0" Click="MoveDown_Click"/>
+                                        <ComboBox Width="82" Margin="2,0" Loaded="TypeCombo_Loaded" SelectionChanged="TypeCombo_SelectionChanged"/>
+                                    </StackPanel>
+                                </Grid>
+                            </HierarchicalDataTemplate>
+                        </TreeView.ItemTemplate>
+                    </TreeView>
+                </DockPanel>
+
+                <DockPanel x:Name="TablePanel" Visibility="Collapsed" Background="White">
+                    <Border DockPanel.Dock="Top" Background="#FAFAFA" BorderBrush="#E4E4E7" BorderThickness="0,0,0,1" Padding="6">
+                        <DockPanel LastChildFill="True">
+                            <Button x:Name="TableBackButton" DockPanel.Dock="Left" Content="&lt; List" Padding="8,2" Click="TableBack_Click"/>
+                            <Button x:Name="TableHelpButton" DockPanel.Dock="Right" Content="Help" Padding="8,2" Margin="6,0,0,0" Click="TableHelp_Click"/>
+                            <Button x:Name="TableApplySortButton" DockPanel.Dock="Right" Content="Apply to Structure" Padding="8,2" Margin="6,0,0,0" IsEnabled="False" Click="TableApplySort_Click"/>
+                            <Button x:Name="TableAddColumnButton" DockPanel.Dock="Right" Content="+ Column" Padding="8,2" Margin="6,0,0,0" Click="TableAddColumn_Click"/>
+                            <Button x:Name="TableAddRowButton" DockPanel.Dock="Right" Content="+ Row" Padding="8,2" Margin="6,0,0,0" Click="TableAddRow_Click"/>
+                            <TextBlock x:Name="TableSubjectText" VerticalAlignment="Center" Margin="10,0,0,0" Foreground="#3F3F46"/>
+                        </DockPanel>
+                    </Border>
+                    <DataGrid x:Name="TableGrid"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False"
+                              CanUserDeleteRows="False"
+                              CanUserReorderColumns="False"
+                              CanUserSortColumns="True"
+                              Sorting="TableGrid_Sorting"
+                              SelectionMode="Single"
+                              SelectionUnit="FullRow"
+                              HeadersVisibility="Column"
+                              EnableRowVirtualization="True"
+                              EnableColumnVirtualization="True"
+                              VirtualizingPanel.VirtualizationMode="Recycling"
+                              BorderThickness="0"
+                              MouseDoubleClick="TableGrid_MouseDoubleClick"
+                              BeginningEdit="TableGrid_BeginningEdit"
+                              CellEditEnding="TableGrid_CellEditEnding"/>
+                </DockPanel>
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+        <TabControl Grid.Row="3" x:Name="MessageTabs" Margin="8,0,8,8">
+            <TabItem x:Name="SyntaxTab" Header="Syntax">
+                <ListView x:Name="DiagnosticList" SelectionChanged="DiagnosticList_SelectionChanged">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn x:Name="SyntaxSeverityColumn" Header="Severity" Width="90" DisplayMemberBinding="{Binding Severity}"/>
+                            <GridViewColumn x:Name="SyntaxCodeColumn" Header="Code" Width="90" DisplayMemberBinding="{Binding ErrorCode}"/>
+                            <GridViewColumn x:Name="SyntaxLineColumn" Header="Line" Width="70" DisplayMemberBinding="{Binding Line}"/>
+                            <GridViewColumn x:Name="SyntaxColumnColumn" Header="Column" Width="80" DisplayMemberBinding="{Binding Column}"/>
+                            <GridViewColumn x:Name="SyntaxMessageColumn" Header="Message" Width="780" DisplayMemberBinding="{Binding Message}"/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </TabItem>
+            <TabItem x:Name="SchemaResultTab" Header="Schema">
+                <DockPanel>
+                    <Border DockPanel.Dock="Top" Background="#FAFAFA" BorderBrush="#E4E4E7" BorderThickness="0,0,0,1" Padding="6">
+                        <DockPanel LastChildFill="True">
+                            <Button x:Name="ShowSchemaDefinitionButton" DockPanel.Dock="Right" Content="Show Schema Definition" Margin="6,0,0,0" Padding="8,2" Click="ShowSchemaDefinition_Click"/>
+                            <TextBlock x:Name="SchemaSourceText" Text="No schema loaded." VerticalAlignment="Center" Foreground="#52525B"/>
+                        </DockPanel>
+                    </Border>
+                    <ListView x:Name="SchemaList" SelectionChanged="SchemaList_SelectionChanged" MouseDoubleClick="SchemaList_MouseDoubleClick">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn x:Name="SchemaSeverityColumn" Header="Severity" Width="80" DisplayMemberBinding="{Binding Severity}"/>
+                                <GridViewColumn x:Name="SchemaCodeColumn" Header="Code" Width="120" DisplayMemberBinding="{Binding ErrorCode}"/>
+                                <GridViewColumn x:Name="SchemaLineColumn" Header="Line" Width="60" DisplayMemberBinding="{Binding Line}"/>
+                                <GridViewColumn x:Name="SchemaPointerColumn" Header="Pointer" Width="180" DisplayMemberBinding="{Binding JsonPointer}"/>
+                                <GridViewColumn x:Name="SchemaPathColumn" Header="SchemaPath" Width="240" DisplayMemberBinding="{Binding SchemaPath}"/>
+                                <GridViewColumn x:Name="SchemaMessageColumn" Header="Message" Width="440" DisplayMemberBinding="{Binding Message}"/>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </DockPanel>
+            </TabItem>
+            <TabItem x:Name="ConversionTab" Header="Conversion">
+                <ListBox x:Name="ConversionList" FontFamily="Consolas"/>
+            </TabItem>
+            <TabItem x:Name="LogTab" Header="Log">
+                <ListBox x:Name="LogList" FontFamily="Consolas"/>
+            </TabItem>
+        </TabControl>
+
+        <StatusBar Grid.Row="4">
+            <StatusBarItem>
+                <TextBlock x:Name="FileFormatStatusText" Text="JSON"/>
+            </StatusBarItem>
+            <Separator/>
+            <StatusBarItem>
+                <TextBlock x:Name="EncodingStatusText" Text="UTF-8"/>
+            </StatusBarItem>
+            <Separator/>
+            <StatusBarItem>
+                <TextBlock x:Name="NewLineStatusText" Text="LF"/>
+            </StatusBarItem>
+            <Separator/>
+            <StatusBarItem>
+                <TextBlock x:Name="CaretStatusText" Text="Ln 1, Col 1"/>
+            </StatusBarItem>
+            <Separator/>
+            <StatusBarItem>
+                <TextBlock x:Name="PointerStatusText" Text="Pointer: (root)"/>
+            </StatusBarItem>
+            <Separator/>
+            <StatusBarItem>
+                <TextBlock x:Name="NodeCountStatusText" Text="0 nodes"/>
+            </StatusBarItem>
+            <Separator/>
+            <StatusBarItem>
+                <TextBlock x:Name="ParseStatusText" Text="Not checked"/>
+            </StatusBarItem>
+            <Separator/>
+            <StatusBarItem>
+                <TextBlock x:Name="DirtyStatusText" Text="Saved"/>
+            </StatusBarItem>
+            <Separator/>
+            <StatusBarItem>
+                <TextBlock x:Name="SchemaStatusText" Text="No schema"/>
+            </StatusBarItem>
+            <Separator/>
+            <StatusBarItem>
+                <TextBlock x:Name="FileStatusText" Text="Untitled"/>
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
+</Window>

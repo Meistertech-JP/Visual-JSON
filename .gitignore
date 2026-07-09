@@ -1,0 +1,11 @@
+docs/
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.tmp
+*.bak
+*.recovery
+TestResults/
+artifacts/
