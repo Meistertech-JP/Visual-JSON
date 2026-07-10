@@ -1,0 +1,51 @@
+# SPDX-License-Identifier: MPL-2.0
+# v1.3 CI: reproducible build/test/package/checksum for the unsigned zip
+# distribution (spec 04). Release asset upload stays manual for v1.3.
+name: build-test-package
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-test-package:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore VisualJson.slnx
+
+      - name: Build
+        run: dotnet build VisualJson.slnx --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test tests\VisualJson.Tests\VisualJson.Tests.vbproj --configuration Release --no-build --logger trx --results-directory artifacts\verification
+
+      - name: Package
+        shell: pwsh
+        run: .\scripts\package-windows-x64.ps1
+
+      - name: Verify release package (self-test)
+        shell: pwsh
+        run: .\scripts\verify-release-package.ps1 -SelfTest
+
+      - name: Verify release package
+        shell: pwsh
+        run: .\scripts\verify-release-package.ps1
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-json-win-x64
+          path: |
+            artifacts/*.zip
+            artifacts/*.sha256
+            artifacts/verification/*.trx

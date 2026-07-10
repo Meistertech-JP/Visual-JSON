@@ -1,13 +1,22 @@
 # SPDX-License-Identifier: MPL-2.0
 param(
     [string]$Configuration = "Release",
-    [string]$Version = "1.2.0"
+    [string]$Version = ""
 )
 
 $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $project = Join-Path $repoRoot "src\VisualJson.App\VisualJson.App.vbproj"
+
+# Single source of truth for the version: the app project file (PKG-13 / NFR-13-CI-003).
+if ([string]::IsNullOrWhiteSpace($Version)) {
+    $match = Select-String -Path $project -Pattern '<Version>([^<]+)</Version>' | Select-Object -First 1
+    if ($null -eq $match) {
+        throw "Could not read <Version> from $project; pass -Version explicitly."
+    }
+    $Version = $match.Matches[0].Groups[1].Value.Trim()
+}
 $artifactsRoot = Join-Path $repoRoot "artifacts"
 $publishRoot = Join-Path $repoRoot "artifacts\publish\VisualJson-win-x64"
 $zipPath = Join-Path $repoRoot "artifacts\visual-json-v$Version-win-x64.zip"
