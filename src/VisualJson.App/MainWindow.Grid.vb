@@ -7,6 +7,8 @@ Imports VisualJson.Core.Models
 Imports VisualJson.Core.Services
 
 ' Grid/tree operations: selection, editing, filtering, drag & drop, undo/redo, and text sync (FR-13-103).
+' Exceeds the 800-line guideline (NFR-13-MAINT-002): the grid is the largest feature area and its
+' handlers share drag/undo/selection state; splitting further would separate handlers from that state.
 Partial Class MainWindow
 
 #Region "Event Handlers"
