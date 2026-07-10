@@ -90,6 +90,7 @@ Module Program
                     Directory.Delete(tempRoot, recursive:=True)
                 End If
             Catch
+                ' IgnoreWithReason: harness temp-dir cleanup is best effort and must not mask the run result.
             End Try
             Console.WriteLine("phase=report done")
         End Try
@@ -760,6 +761,7 @@ Module Program
                                                        End Using
                                                        Return True
                                                    Catch
+                                                       ' IgnoreWithReason: parse probe; False marks the line invalid for the check below.
                                                        Return False
                                                    End Try
                                                End Function)
@@ -847,11 +849,13 @@ Module Program
                 savedValid = True
             End Using
         Catch
+            ' IgnoreWithReason: the step flags stay False, so the PassIf row below reports the failure.
         End Try
 
         Try
             Directory.Delete(tempDir, recursive:=True)
         Catch
+            ' IgnoreWithReason: harness temp-dir cleanup is best effort and must not mask the run result.
         End Try
 
         results.Add(PassIf("IT-P2-005", "Table edits reflect to text and save as valid JSON", editName AndAlso editMissing AndAlso editsApplied AndAlso saved AndAlso savedValid, $"edits={editsApplied}, saved={saved}, valid={savedValid}"))

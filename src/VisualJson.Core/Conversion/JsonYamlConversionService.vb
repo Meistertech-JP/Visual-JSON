@@ -377,7 +377,7 @@ Namespace Conversion
             Dim key = ParseKey(keyText, lineNumber)
 
             If mapping.ContainsKey(key) Then
-                Throw New InvalidOperationException($"Duplicate key '{key}' at line {lineNumber}.")
+                Throw New InvalidOperationException($"Duplicate mapping key at line {lineNumber}. (Key names are omitted from error messages so document content never reaches logs.)")
             End If
 
             If valueText.Length = 0 Then

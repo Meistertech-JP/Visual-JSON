@@ -213,7 +213,7 @@ Partial Class MainWindow
         Document.IsDirty = isDirty
         Document.RootNode = Nothing
         _gridRootView = Nothing
-        _lastGridState = Nothing
+        Document.GridState = Nothing
         _filterRestoreState = Nothing
         _gridIsCurrent = False
         Document.FormatKind = format

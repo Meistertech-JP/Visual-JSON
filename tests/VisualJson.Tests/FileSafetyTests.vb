@@ -45,6 +45,7 @@ Public Class FileSafetyTests
                 saver.Save(target, "{""broken"":")
                 Throw New InvalidOperationException("invalid save unexpectedly succeeded")
             Catch ex As System.Text.Json.JsonException
+                ' Expected: strict validation rejects the save; the assert below checks the file is untouched.
             End Try
 
             AssertEqual("{""old"":true}", File.ReadAllText(target), "existing file after invalid save")
@@ -130,4 +131,24 @@ Public Class FileSafetyTests
             Directory.Delete(tempRoot, recursive:=True)
         End Try
     End Sub
+    <TestMethod(DisplayName:="UT-13-LOG-001 crash-log formatting omits exception messages")>
+    Public Sub CrashLogFormattingOmitsMessages()
+        ' NFR-13-SEC-003: Message text may carry document content and must never
+        ' reach a persisted log. The crash log uses this shared formatter.
+        Dim inner = New InvalidOperationException("""secret-inner"":true")
+        Dim ex As Exception
+        Try
+            Throw New InvalidOperationException("""secret-outer"":1", inner)
+        Catch caught As Exception
+            ex = caught
+        End Try
+
+        Dim text = FileLogService.DescribeException(ex)
+
+        AssertContains(text, "System.InvalidOperationException", "exception type recorded")
+        AssertContains(text, "--- inner (1) ---", "inner chain recorded")
+        AssertFalse(text.Contains("secret-outer", StringComparison.OrdinalIgnoreCase), "outer message omitted")
+        AssertFalse(text.Contains("secret-inner", StringComparison.OrdinalIgnoreCase), "inner message omitted")
+    End Sub
+
 End Class

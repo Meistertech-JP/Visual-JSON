@@ -78,6 +78,7 @@ Public Class ConversionTests
                 Dim result = conversion.ConvertJsonToXml(File.ReadAllText(source))
                 Throw New InvalidOperationException("invalid JSON conversion unexpectedly succeeded")
             Catch ex As System.Text.Json.JsonException
+                ' Expected: the invalid document must fail; the assert below checks the file is untouched.
             End Try
 
             AssertEqual("{""broken"":", File.ReadAllText(source), "source unchanged after failed conversion")
@@ -123,12 +124,14 @@ Public Class ConversionTests
             yamlConversion.ConvertYamlToJson("value: &anchor 1")
             Throw New InvalidOperationException("anchor unexpectedly accepted")
         Catch ex As InvalidOperationException When ex.Message.Contains("Unsupported YAML feature", StringComparison.Ordinal)
+            ' Expected: the filtered catch itself is the assertion.
         End Try
 
         Try
             yamlConversion.ConvertYamlToJson("value: {a: 1}")
             Throw New InvalidOperationException("non-empty flow mapping unexpectedly accepted")
         Catch ex As InvalidOperationException When ex.Message.Contains("flow collections", StringComparison.Ordinal)
+            ' Expected: the filtered catch itself is the assertion.
         End Try
     End Sub
 
@@ -228,4 +231,22 @@ Public Class ConversionTests
         AssertEqual(1, singleArrayLine.Children.Count, "single array line stays one element")
         AssertEqual(JsonNodeKind.ArrayValue, singleArrayLine.Children(0).Kind, "single array line keeps historical wrapping")
     End Sub
+    <TestMethod(DisplayName:="UT-13-LOG-002 YAML duplicate-key error omits the key name")>
+    Public Sub YamlDuplicateKeyErrorOmitsKeyName()
+        ' NFR-13-SEC-003: the exception message flows into the in-app log pane,
+        ' so it must not carry the document-derived key name.
+        Dim service = New JsonYamlConversionService()
+        Dim thrown As Exception = Nothing
+        Try
+            service.ConvertYamlToJson("secretkey: 1" & Environment.NewLine & "secretkey: 2")
+            Throw New InvalidOperationException("duplicate key unexpectedly accepted")
+        Catch ex As InvalidOperationException When ex.Message.Contains("Duplicate mapping key", StringComparison.Ordinal)
+            thrown = ex
+        End Try
+
+        AssertTrue(thrown IsNot Nothing, "duplicate key rejected")
+        AssertFalse(thrown.Message.Contains("secretkey", StringComparison.OrdinalIgnoreCase), "key name omitted")
+        AssertContains(thrown.Message, "line 2", "line number kept")
+    End Sub
+
 End Class

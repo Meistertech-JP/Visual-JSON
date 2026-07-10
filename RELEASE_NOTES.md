@@ -33,7 +33,7 @@ Unchanged from 1.2.0 — see the Limitations section in [README.md](README.md).
 
 ## Verification
 
-- Unit/integration: `dotnet test` 94/94 pass (TRX recorded).
+- Unit/integration: `dotnet test` 97/97 pass (TRX recorded).
 - Regression: the full Phase 2 acceptance harness (real-window automation across text/grid/table/schema/conversion/save flows) passes with exit code 0.
 - Package: `verify-release-package.ps1` passes all checks including the docs-exclusion scan.
 

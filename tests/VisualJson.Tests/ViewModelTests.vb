@@ -2,6 +2,7 @@
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
 Imports VisualJson.App.ViewModels
 Imports VisualJson.Core.Diagnostics
+Imports VisualJson.Core.Services
 
 <TestClass>
 Public Class ViewModelTests
@@ -82,6 +83,36 @@ Public Class ViewModelTests
         changed.Clear()
         vm.SelectedJsonPointer = "/items/3/name"
         AssertEqual(0, changed.Count, "no event for identical value")
+    End Sub
+
+    <TestMethod(DisplayName:="UT-13-VM-006 document holds validation state, pointer, and grid state (FR-13-202)")>
+    Public Sub DocumentHoldsValidationPointerAndGridState()
+        Dim vm = New MainViewModel()
+        Dim document = vm.ActiveDocument
+        Dim changed = New List(Of String)()
+        AddHandler vm.PropertyChanged, Sub(sender, e) changed.Add(e.PropertyName)
+
+        AssertEqual("Not checked", document.ValidationState, "validation state default")
+        AssertEqual("", document.SelectedPointer, "pointer default")
+        AssertTrue(document.GridState Is Nothing, "grid state default")
+
+        ' StatusText/SelectedJsonPointer are views over the document state (single source).
+        vm.StatusText = "Valid JSON"
+        AssertEqual("Valid JSON", document.ValidationState, "status writes through to the document")
+
+        document.ValidationState = "Invalid JSON"
+        AssertEqual("Invalid JSON", vm.StatusText, "document state surfaces as status text")
+        AssertTrue(changed.Contains(NameOf(MainViewModel.StatusText)), "document change raises StatusText")
+
+        changed.Clear()
+        document.SelectedPointer = "/a/b"
+        AssertEqual("/a/b", vm.SelectedJsonPointer, "document pointer surfaces on the app view model")
+        AssertTrue(changed.Contains(NameOf(MainViewModel.SelectedJsonPointer)), "pointer change forwarded")
+        AssertTrue(changed.Contains(NameOf(MainViewModel.PointerDisplayText)), "pointer display forwarded")
+
+        Dim state = New DocumentStateService().CreateState("/a", New List(Of String) From {"/a"}, "/a", 3, 1.5)
+        document.GridState = state
+        AssertTrue(Object.ReferenceEquals(document.GridState, state), "grid state stored on the document")
     End Sub
 
 End Class

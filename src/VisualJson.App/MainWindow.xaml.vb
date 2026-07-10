@@ -95,7 +95,6 @@ Public Class MainWindow
     Private _language As String = "en"
     Private _settings As AppSettings = AppSettings.CreateDefault()
     Private _gridRootView As GridNodeViewModel
-    Private _lastGridState As GridViewState
     Private _filterRestoreState As GridViewState
     Private _gridIsCurrent As Boolean
     Private _handlingTabSwitch As Boolean

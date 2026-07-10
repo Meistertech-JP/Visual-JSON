@@ -28,8 +28,10 @@ Class Application
 
     Private Shared Sub WriteCrashLog(ex As Exception)
         Try
+            ' Exception types and stack traces only — Message text may carry document
+            ' content and must never reach a persisted log (NFR-13-SEC-003).
             Dim path = IO.Path.Combine(IO.Path.GetTempPath(), "VisualJson.lastcrash.log")
-            IO.File.WriteAllText(path, ex.ToString())
+            IO.File.WriteAllText(path, VisualJson.Core.Infrastructure.FileLogService.DescribeException(ex))
         Catch
             ' IgnoreWithReason (spec 06 §3.1): a secondary failure while writing the
             ' crash log must not mask the original crash being reported.

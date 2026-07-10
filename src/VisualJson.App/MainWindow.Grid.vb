@@ -50,7 +50,7 @@ Partial Class MainWindow
             Return
         End If
 
-        _lastGridState = CaptureGridState(node.JsonPointer)
+        Document.GridState = CaptureGridState(node.JsonPointer)
         UpdatePointerStatus(node.JsonPointer)
     End Sub
 
@@ -497,7 +497,7 @@ Partial Class MainWindow
         If recordState Then
             Dim caretOffset = If(state Is Nothing, 0, state.TextCaretOffset)
             Dim scrollOffset = If(state Is Nothing, 0, state.TextScrollOffset)
-            _lastGridState = _documentState.CreateState(If(selectedPointer, ""), expanded, If(selectedPointer, ""), caretOffset, scrollOffset)
+            Document.GridState = _documentState.CreateState(If(selectedPointer, ""), expanded, If(selectedPointer, ""), caretOffset, scrollOffset)
         End If
 
         UpdatePointerStatus(selectedPointer)
@@ -719,7 +719,7 @@ Partial Class MainWindow
         End If
 
         Dim pointer = _documentState.GetPointerAtOffset(Document.RootNode, caretOffset)
-        _lastGridState = _documentState.CreateState(pointer, priorState.ExpandedPointers, pointer, caretOffset, scrollOffset)
+        Document.GridState = _documentState.CreateState(pointer, priorState.ExpandedPointers, pointer, caretOffset, scrollOffset)
         SelectPointerInGrid(pointer, bringIntoView:=True)
         UpdatePointerStatus(pointer)
         Return True
@@ -727,16 +727,16 @@ Partial Class MainWindow
 
     Private Sub SwitchGridToText(Optional focusPointer As String = Nothing)
         Dim pointer = If(focusPointer, GetSelectedGridPointer())
-        _lastGridState = CaptureGridState(pointer)
+        Document.GridState = CaptureGridState(pointer)
 
         If Not String.IsNullOrEmpty(pointer) AndAlso MoveTextCaretToPointer(pointer) Then
             UpdatePointerStatus(pointer)
             Return
         End If
 
-        If _lastGridState IsNot Nothing Then
-            _editor.SetCaretOffset(_lastGridState.TextCaretOffset)
-            _editor.ScrollToVerticalOffset(_lastGridState.TextScrollOffset)
+        If Document.GridState IsNot Nothing Then
+            _editor.SetCaretOffset(Document.GridState.TextCaretOffset)
+            _editor.ScrollToVerticalOffset(Document.GridState.TextScrollOffset)
         End If
 
         UpdateCaretStatus()
@@ -746,8 +746,8 @@ Partial Class MainWindow
                                       Optional textCaretOffset As Integer? = Nothing,
                                       Optional textScrollOffset As Double? = Nothing) As GridViewState
         Dim pointer = If(selectedPointer, GetSelectedGridPointer())
-        If String.IsNullOrEmpty(pointer) AndAlso _lastGridState IsNot Nothing Then
-            pointer = _lastGridState.SelectedPointer
+        If String.IsNullOrEmpty(pointer) AndAlso Document.GridState IsNot Nothing Then
+            pointer = Document.GridState.SelectedPointer
         End If
 
         Dim expanded = New HashSet(Of String)(StringComparer.Ordinal)
@@ -755,8 +755,8 @@ Partial Class MainWindow
             _gridRootView.CollectExpandedPointers(expanded)
         End If
 
-        If expanded.Count = 0 AndAlso _lastGridState IsNot Nothing Then
-            For Each item In _lastGridState.ExpandedPointers
+        If expanded.Count = 0 AndAlso Document.GridState IsNot Nothing Then
+            For Each item In Document.GridState.ExpandedPointers
                 expanded.Add(item)
             Next
         End If
@@ -768,7 +768,7 @@ Partial Class MainWindow
 
         Dim caret = If(textCaretOffset.HasValue, textCaretOffset.Value, If(_editor Is Nothing, 0, _editor.GetCaretOffset()))
         Dim scroll = If(textScrollOffset.HasValue, textScrollOffset.Value, If(_editor Is Nothing, 0, _editor.GetVerticalOffset()))
-        Dim anchor = If(String.IsNullOrEmpty(pointer) AndAlso _lastGridState IsNot Nothing, _lastGridState.AnchorPointer, pointer)
+        Dim anchor = If(String.IsNullOrEmpty(pointer) AndAlso Document.GridState IsNot Nothing, Document.GridState.AnchorPointer, pointer)
         Return _documentState.CreateState(pointer, expanded, anchor, caret, scroll)
     End Function
 
@@ -783,8 +783,8 @@ Partial Class MainWindow
             Return selectedFromVm
         End If
 
-        If _lastGridState IsNot Nothing Then
-            Return _lastGridState.SelectedPointer
+        If Document.GridState IsNot Nothing Then
+            Return Document.GridState.SelectedPointer
         End If
 
         Return Nothing
@@ -804,7 +804,7 @@ Partial Class MainWindow
 
         ClearGridSelection(_gridRootView)
         ExpandAndSelect(_gridRootView, targetPointer)
-        _lastGridState = CaptureGridState(targetPointer)
+        Document.GridState = CaptureGridState(targetPointer)
 
         If bringIntoView Then
             Dispatcher.BeginInvoke(Sub() BringPointerIntoView(targetPointer), DispatcherPriority.Background)

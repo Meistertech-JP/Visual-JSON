@@ -43,6 +43,8 @@ Partial Class MainWindow
         End Select
     End Function
 
+    ' Exceeds the 100-line guideline (NFR-13-MAINT-002): this is a flat, order-free list of
+    ' one localized assignment per UI element; splitting it would only scatter the catalog.
     Private Sub ApplyLanguage()
         If FileMenu Is Nothing OrElse ActionHeader Is Nothing Then
             Return

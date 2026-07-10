@@ -2,10 +2,12 @@
 Imports VisualJson.Core.Infrastructure
 Imports VisualJson.Core.Models
 Imports VisualJson.Core.Parsing
+Imports VisualJson.Core.Services
 
 Namespace ViewModels
     ''' Per-document state (FR-13-202): path, body text at document boundaries,
-    ''' dirty flag, input format, encoding/newline, and the parsed grid root.
+    ''' dirty flag, input format, encoding/newline, validation state, selected
+    ''' pointer, grid view state, and the parsed grid root.
     ''' Diagnostics/log collections live on MessagePaneViewModel (FR-13-203).
     Public Class DocumentViewModel
         Inherits ObservableObject
@@ -17,6 +19,9 @@ Namespace ViewModels
         Private _encoding As DetectedTextEncoding = DetectedTextEncoding.CreateDefault()
         Private _rootNode As JsonTreeNode
         Private _nodeCount As Integer
+        Private _validationState As String = "Not checked"
+        Private _selectedPointer As String = ""
+        Private _gridState As GridViewState
 
         Public Property CurrentFilePath As String
             Get
@@ -94,6 +99,37 @@ Namespace ViewModels
             End Get
             Set(value As JsonTreeNode)
                 SetProperty(_rootNode, value)
+            End Set
+        End Property
+
+        ''' Syntax/schema validation summary of this document ("Not checked", "Valid JSON", "Invalid JSON").
+        Public Property ValidationState As String
+            Get
+                Return _validationState
+            End Get
+            Set(value As String)
+                SetProperty(_validationState, If(value, ""))
+            End Set
+        End Property
+
+        ''' RFC 6901 pointer of the current selection/caret position ("" = root).
+        Public Property SelectedPointer As String
+            Get
+                Return _selectedPointer
+            End Get
+            Set(value As String)
+                SetProperty(_selectedPointer, If(value, ""))
+            End Set
+        End Property
+
+        ''' Last captured grid view state (expansion/selection/scroll), used to
+        ''' restore the grid across text/grid round trips.
+        Public Property GridState As GridViewState
+            Get
+                Return _gridState
+            End Get
+            Set(value As GridViewState)
+                SetProperty(_gridState, value)
             End Set
         End Property
 

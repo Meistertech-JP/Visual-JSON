@@ -35,6 +35,26 @@ Namespace Infrastructure
             Return Write(operation, detail)
         End Function
 
+        ''' Formats an exception chain for persisted logs without any Message text,
+        ''' so document/schema content that leaked into a message can never reach a
+        ''' log file (NFR-13-SEC-003). Used by the crash log as well.
+        Public Shared Function DescribeException(ex As Exception) As String
+            Dim builder = New StringBuilder()
+            Dim current = ex
+            Dim depth = 0
+            While current IsNot Nothing AndAlso depth < 10
+                If depth > 0 Then
+                    builder.AppendLine($"--- inner ({depth}) ---")
+                End If
+                builder.AppendLine(current.GetType().FullName)
+                builder.AppendLine(If(current.StackTrace, "(no stack trace)"))
+                current = current.InnerException
+                depth += 1
+            End While
+
+            Return builder.ToString()
+        End Function
+
         Private Function CurrentLogPath() As String
             Return Path.Combine(LogDirectory, $"visualjson-{DateTime.Now:yyyyMMdd}.log")
         End Function
