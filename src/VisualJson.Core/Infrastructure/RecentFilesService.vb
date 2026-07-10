@@ -48,6 +48,7 @@ Namespace Infrastructure
             Try
                 Return IO.Path.GetFullPath(If(path, "").Trim())
             Catch
+                ' IgnoreWithReason: an unnormalizable path is kept as typed so history stays usable.
                 Return If(path, "").Trim()
             End Try
         End Function

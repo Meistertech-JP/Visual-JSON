@@ -31,6 +31,8 @@ Class Application
             Dim path = IO.Path.Combine(IO.Path.GetTempPath(), "VisualJson.lastcrash.log")
             IO.File.WriteAllText(path, ex.ToString())
         Catch
+            ' IgnoreWithReason (spec 06 §3.1): a secondary failure while writing the
+            ' crash log must not mask the original crash being reported.
         End Try
     End Sub
 End Class

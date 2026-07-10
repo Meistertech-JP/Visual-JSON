@@ -61,6 +61,7 @@ Namespace Services
                     Return document.RootElement.ValueKind = JsonValueKind.Number
                 End Using
             Catch ex As JsonException
+                ' IgnoreWithReason: this is a predicate; not-parsable means the input is not this type.
                 Return False
             End Try
         End Function
@@ -81,6 +82,7 @@ Namespace Services
                     Return True
                 End Using
             Catch ex As JsonException
+                ' IgnoreWithReason: this is a predicate; not-parsable means the input is not this type.
                 Return False
             End Try
         End Function

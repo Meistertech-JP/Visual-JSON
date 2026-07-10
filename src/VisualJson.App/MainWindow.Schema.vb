@@ -140,7 +140,9 @@ Partial Class MainWindow
                 End If
             End Using
         Catch ex As Exception
+            ' LogOnly: $schema probing is best effort; the user can still load a schema manually.
             _lastException = ex
+            _fileLog.WriteException("SchemaUrlProbeFailed", ex)
         End Try
 
         Return Nothing
@@ -181,7 +183,9 @@ Partial Class MainWindow
                 Return node.SourceStartIndex.Value
             End If
         Catch ex As Exception
+            ' LogOnly: falling back to an unhighlighted schema view is acceptable; record why.
             _lastException = ex
+            _fileLog.WriteException("SchemaDefinitionLookupFailed", ex)
         End Try
 
         Return Nothing

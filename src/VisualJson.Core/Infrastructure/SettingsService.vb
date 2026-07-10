@@ -60,6 +60,7 @@ Namespace Infrastructure
                         Try
                             File.Delete(tempPath)
                         Catch
+                            ' IgnoreWithReason: temp-file cleanup is best effort; the retry loop reports the save failure.
                         End Try
                     End If
                     Threading.Thread.Sleep(25)

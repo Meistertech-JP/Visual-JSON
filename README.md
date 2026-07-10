@@ -13,9 +13,11 @@ A Windows-first JSON editor built with VB.NET and WPF. Edit JSON as text or as a
 | Local-only workflow | Yes | No | Yes |
 | Grid editing | Extension-dependent | Limited | Built in |
 | Table View | Limited | Limited | Built in |
-| Schema diagnostic jump | Yes | Partial | Yes |
+| Schema diagnostic jump | Yes | Partial | Yes * |
 | XML/YAML conversion preview | Partial | Partial | Built in |
 | Pre-save validation / backup / recovery | Partial | No | Built in |
+
+\* Schema validation covers a practical subset of JSON Schema keywords; `allOf`/`anyOf`/`oneOf`, `$id`, and remote `$ref` are not supported. See [Limitations](#limitations-v120).
 
 ## Sample Files
 

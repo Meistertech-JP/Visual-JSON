@@ -13,9 +13,11 @@ English version: see [README.md](README.md).
 | ローカル完結 | ○ | × | ○ |
 | グリッド編集 | 拡張依存 | 限定的 | 標準搭載 |
 | Table View | 限定的 | 限定的 | 標準搭載 |
-| Schema診断ジャンプ | ○ | 一部対応 | ○ |
+| Schema診断ジャンプ | ○ | 一部対応 | ○ * |
 | XML/YAML変換preview | 一部対応 | 一部対応 | 標準搭載 |
 | 保存前検証 / backup / recovery | 一部対応 | × | 標準搭載 |
+
+\* Schema検証はJSON Schemaキーワードの実用サブセット対応です。`allOf`/`anyOf`/`oneOf`、`$id`、リモート`$ref` には対応しません。詳細は「制限」の節を参照してください。
 
 ## サンプルファイル
 

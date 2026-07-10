@@ -99,6 +99,7 @@ Namespace Parsing
 
                 Return True
             Catch ex As Text.Json.JsonException
+                ' IgnoreWithReason: this is a predicate; not-parsable simply means "not a single document".
                 Return False
             End Try
         End Function

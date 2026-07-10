@@ -52,6 +52,7 @@ Namespace Infrastructure
                 Try
                     File.Delete(path)
                 Catch
+                    ' IgnoreWithReason: failing to prune an old log must not break logging itself.
                 End Try
             Next
         End Sub

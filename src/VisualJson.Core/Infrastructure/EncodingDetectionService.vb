@@ -44,6 +44,7 @@ Namespace Infrastructure
                 StrictUtf8.GetString(source)
                 Return New DetectedTextEncoding(TextEncodingKind.Utf8, StrictUtf8, False, NewLineKind.Lf, "")
             Catch
+                ' Report: the fallback carries a user-visible warning in DetectedTextEncoding.Warning.
                 Return New DetectedTextEncoding(TextEncodingKind.Utf8, LenientUtf8, False, NewLineKind.Lf, "Encoding could not be determined; opened as UTF-8.")
             End Try
         End Function

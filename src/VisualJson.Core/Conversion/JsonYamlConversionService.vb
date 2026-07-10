@@ -489,6 +489,7 @@ Namespace Conversion
                     End If
                 End Using
             Catch ex As JsonException
+                ' IgnoreWithReason: not strict-JSON parsable; fall back to the raw scalar text below.
             End Try
 
             Return JsonValue.Create(valueText)
@@ -517,6 +518,7 @@ Namespace Conversion
                     End If
                 End Using
             Catch ex As JsonException
+                ' IgnoreWithReason: parse failure is converted into the explicit error below.
             End Try
 
             Throw New InvalidOperationException($"Invalid double-quoted scalar at line {lineNumber}.")
