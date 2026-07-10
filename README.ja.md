@@ -4,6 +4,28 @@ Visual JSON は VB.NET / WPF で実装した Windows-first の JSON エディタ
 
 English version: see [README.md](README.md).
 
+![Visual JSON workflow demo: deep JSON, grid pointer sync, table editing, schema jump, and safe conversion preview](assets/demo/visual-json-workflow.gif)
+
+## Visual JSON が向いている場面
+
+| 機能 | VS Code | オンラインJSONツール | Visual JSON |
+| --- | --- | --- | --- |
+| ローカル完結 | ○ | × | ○ |
+| グリッド編集 | 拡張依存 | 限定的 | 標準搭載 |
+| Table View | 限定的 | 限定的 | 標準搭載 |
+| Schema診断ジャンプ | ○ | 一部対応 | ○ |
+| XML/YAML変換preview | 一部対応 | 一部対応 | 標準搭載 |
+| 保存前検証 / backup / recovery | 一部対応 | × | 標準搭載 |
+
+## サンプルファイル
+
+[`samples/`](samples/) には、Visual JSON の良さをすぐ試せるサンプルを同梱しています。
+
+- [`api-response-invalid.json`](samples/api-response-invalid.json): [`schema/user.schema.json`](samples/schema/user.schema.json) と組み合わせて、Schema診断とクリックジャンプを試せます。
+- [`users-array.json`](samples/users-array.json): Gridへ切り替えて、Table View、列ソート、セル編集を試せます。
+- [`config.jsonc`](samples/config.jsonc): JSONCコメント、末尾カンマ、検証、整形を試せます。
+- [`events.jsonl`](samples/events.jsonl): JSON Linesを配列相当ドキュメントとして開き、行形式で保存できます。
+
 ## Screenshots
 
 | Table View | Schema diagnostics |
@@ -124,4 +146,4 @@ dotnet run --project tests\VisualJson.Tests\VisualJson.Tests.vbproj
 
 ## ライセンス
 
-ソースコードは Mozilla Public License Version 2.0 (MPL-2.0) です。詳細は [LICENSE](LICENSE) を参照してください。Visual JSON の名称、ロゴ、スクリーンショット、プロジェクトのブランド表現は MPL-2.0 の対象外で、権利留保です。詳細は [NOTICE.md](NOTICE.md) を参照してください。AvalonEdit は MIT License のまま別枠です。詳細は [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) を参照してください。外部コントリビューションは DCO sign-off を必要とします。詳細は [CONTRIBUTING.md](CONTRIBUTING.md) を参照してください。
+ソースコードは Mozilla Public License Version 2.0 (MPL-2.0) です。詳細は [LICENSE](LICENSE) を参照してください。実行形式パッケージに対応する Source Code Form は、対応するGitHubタグ、たとえば [`v1.2.0`](https://github.com/Meistertech-JP/Visual-JSON/tree/v1.2.0) から取得できます。Visual JSON の名称、ロゴ、スクリーンショット、デモGIF、画像素材、プロジェクトのブランド表現は MPL-2.0 の対象外で、権利留保です。詳細は [NOTICE.md](NOTICE.md) を参照してください。AvalonEdit は MIT License のまま別枠です。詳細は [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) を参照してください。外部コントリビューションは DCO sign-off を必要とします。詳細は [CONTRIBUTING.md](CONTRIBUTING.md) を参照してください。
