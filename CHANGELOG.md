@@ -4,6 +4,20 @@
 
 - No unreleased changes.
 
+## 1.3.0
+
+Internal-quality release: no user-facing feature changes. The structure changed; the behavior did not.
+
+- Split the 3,564-line `MainWindow.xaml.vb` into eleven feature-scoped partial-class files (File, TextEditor, Grid, TableView, Schema, Conversion, Settings, Diagnostics, Commands, Localization, Automation); the root file now holds only fields, the constructor, window lifecycle, and the keyboard router.
+- Realized the view models: `MainViewModel` (mode, busy state, status text, selected JSON Pointer), `DocumentViewModel` (path, boundary-synced text, dirty flag, format, encoding/newline), and a new `MessagePaneViewModel` owning the Syntax/Schema/Conversion/Log collections. Status-bar segments now bind to them.
+- Introduced gesture-less `RoutedUICommand`s for New/Open/Save/Save As/Exit; keyboard shortcuts remain under the central key router (no double firing).
+- Migrated the 82 custom-harness tests to MSTest with byte-identical bodies and preserved display names; `dotnet test` with TRX output is now the single test entry point (94 tests including the new view-model and security suites).
+- Added GitHub Actions CI (`build-test-package.yml`): restore, build, test with TRX, package, release-zip verification, and artifact upload on main pushes, pull requests, and manual dispatch. `global.json` pins the SDK feature band.
+- Added `scripts/verify-release-package.ps1`: checks the zip/sha256 pair (hash recomputed), required public documents, README link integrity inside the zip, the application executable, and that `docs/` is never bundled — with a self-test covering the failure cases on every CI run.
+- Hardened the external-schema URL guard: CGNAT `100.64.0.0/10`, IPv4 multicast/reserved (`224.0.0.0/4`, `240.0.0.0/4`), IPv6 unspecified/multicast, and embedded-IPv4 re-checking for 6to4 (`2002::/16`) and Teredo (`2001:0::/32`). External fetching remains off by default.
+- Audited all 45 `Catch` blocks (classification recorded; zero forbidden swallows): every intentional ignore now carries a reason comment, and two previously silent schema-probe failures now write typed file-log entries.
+- Aligned the README comparison table with the Limitations section (schema validation is a practical keyword subset) in both English and Japanese.
+
 ## 1.2.0
 
 - Added Table View for object-majority arrays (up to 10,000 rows): read-only display, scalar cell editing with type inference, missing-cell materialization on the edited row only, `+ Row` / `+ Column`, display-only column sorting, and "Apply to Structure" as one undo step.

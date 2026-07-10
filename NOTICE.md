@@ -4,7 +4,7 @@
 
 Unless otherwise noted, Visual JSON source code files, including `.vb`, `.xaml`, `.vbproj`, `.slnx`, scripts, and other source files in this repository, are licensed under the Mozilla Public License Version 2.0 (MPL-2.0). See [LICENSE](LICENSE).
 
-For executable packages, the corresponding Source Code Form is available from the matching GitHub tag, for example https://github.com/Meistertech-JP/Visual-JSON/tree/v1.2.0.
+For executable packages, the corresponding Source Code Form is available from the matching GitHub tag, for example https://github.com/Meistertech-JP/Visual-JSON/tree/v1.3.0.
 
 ## Names, Branding, Screenshots, and Demo Assets
 

@@ -1,57 +1,40 @@
-# Visual JSON 1.2.0 Release Notes
+# Visual JSON 1.3.0 Release Notes
 
-This release completes Phase 2 (R2): a Table View for object arrays, cross-parent drag-and-drop, JSON Schema extensions (`const`, `minLength`/`maxLength`, local `$ref`, `format` warnings), XML conversion options, JSON Lines line-format saving, and key completion.
+This is an **internal-quality release**: it contains no new user-facing features and no changes to the UI, shortcuts, save formats, or settings. The motto of this cycle: change the structure, never the behavior.
 
-## New in 1.2.0
+## What changed in 1.3.0
 
-- Table View: object-majority arrays open as "row = element, column = property" from the grid Action column. Missing properties show as empty cells. Up to 10,000 rows; larger arrays warn and stay in the tree.
-- Table editing: scalar cells edit in place with the standard type-inference rules; editing an empty cell creates the property on that row only. `+ Row` appends an empty object row, `+ Column` adds a display column that materializes per edited row. Each committed cell edit is one undo step.
-- Table sorting: column-header sorting changes the display only. "Apply to Structure" writes the display order into the array as one undo step; the `#` column restores the structural order.
-- Grid: drag-and-drop between different parents. Key conflicts ask for confirmation and are resolved with a unique key; moving a node into its own descendants is rejected.
-- Grid: entering exactly `{}` or `[]` in a value cell converts the node to an empty object or array.
-- Schema validation adds `const`, `minLength`/`maxLength` (code points), and same-document `$ref` (`#/...`) with cycle detection (`SCH-REF-CYCLE`) and a depth limit of 32. External `$ref` URLs are reported as a warning and never accessed. `format` (`date-time`/`date`/`time`/`email`/`uri`) reports warnings.
-- Key completion (Ctrl+Space in text mode): suggests keys used by sibling objects in the same array plus schema `properties`, minus existing keys, and inserts `"key": ` from the keyboard.
-- XML export options in the preview: arrays as repeated `<item>` elements (default) or repeated parent-name elements; `null` as an empty element (default) or `xsi:nil="true"` with the `xmlns:xsi` declaration. Options are not persisted; every export starts from the defaults.
-- JSON Lines documents are now saved in line format: one compact JSON per line. The editor continues to display the array-form standard JSON.
-- Sample files are included under `samples/` for Table View, JSONC, JSON Lines, and schema-diagnostic workflows.
-- The Windows ZIP includes README, LICENSE, NOTICE, CONTRIBUTING, third-party notices, samples, and demo assets. Corresponding source is available from the `v1.2.0` GitHub tag.
-- Fixed a latent v1.1.0 issue where a JSON Lines document could no longer be revalidated or saved after a grid edit.
+- **Maintainable UI code.** The single 3,564-line main-window file was split into eleven feature-scoped files, and application state moved into view models (document state, message panes, status bar). The File menu and toolbar now run on WPF commands. Everything looks and behaves exactly as in 1.2.0.
+- **Standard test tooling.** All tests migrated from a custom console runner to MSTest with identical inputs and expectations; `dotnet test` (with TRX result files) is now the single entry point. The suite grew from 82 to 94 tests.
+- **Reproducible builds.** GitHub Actions now restores, builds, tests, packages, and verifies the release zip on every push and pull request, uploading the zip, checksum, and test results as artifacts. Because the binaries are unsigned, this reproducibility plus the published SHA256 is the trust basis for the download.
+- **Verified packaging.** A new verification script checks every release zip: checksum matches, all public documents present, README links resolve inside the zip, the application executable exists, and internal specification documents are never bundled.
+- **Tighter network guard.** The external-schema URL guard (still **off by default**) additionally blocks CGNAT (`100.64.0.0/10`), IPv4 multicast/reserved ranges, IPv6 unspecified/multicast, and 6to4/Teredo addresses whose embedded IPv4 falls in a blocked range.
+- **Exception-handling audit.** All 45 `Catch` blocks were classified; none silently swallow data-affecting errors. Intentional ignores carry reason comments, and two schema-probe failures that previously vanished are now recorded in the file log (types and stack traces only — never document content).
+- **Honest documentation.** The README comparison table now footnotes that schema validation covers a practical keyword subset, matching the Limitations section, in both English and Japanese.
 
-## Compatibility Notes
+## Compatibility
 
-- **JSON Lines save format changed.** v1.1.0 saved `.jsonl`/`.ndjson` documents as a pretty-printed standard JSON array. v1.2.0 saves them as one compact JSON per line (the conventional JSONL form). Blank lines and per-line formatting of the original file are not preserved, and the file always ends with a single trailing newline. If you need the v1.1.0 behavior, save the document with a `.json` extension instead.
+- No changes to file formats, save behavior, settings (`%LocalAppData%\VisualJson\settings.json`), logs, shortcuts, or the UI. Documents saved by 1.2.0 and 1.3.0 are interchangeable.
+- The JSON Lines line-format saving introduced in 1.2.0 is unchanged; see the 1.2.0 notes if you are upgrading from 1.1.0.
 
-## Included (carried over from 1.1.0)
+## Included features (unchanged from 1.2.0)
 
-- AvalonEdit-based text editor with virtualized rendering, built-in line numbers, visible-line syntax coloring, and error-line markers. Large documents stay responsive.
-- An optional pretty-print prompt when opening files with extremely long single lines (unformatted machine JSON).
-- Standard JSON, JSONC, representative JSON5, JSON Lines, and NDJSON open/edit/save workflow.
-- Text and grid modes with synchronization; grid shows JSON Pointer paths. Text/grid position sync, folding, replace, and search highlighting.
-- Syntax diagnostics with error codes and error jump.
-- Grid Action and Grip columns for add, delete, move, type change, drag reorder, Duplicate, Redo, row context menus, Copy JSON Pointer, and Jump to Text.
-- Grid filtering with parent context retained.
-- English/Japanese UI switching, including the message pane and all Table View text.
-- Save-before-overwrite backup with temp-file replace saving; recovery snapshot prompt on next launch.
-- Diagnostics copy without JSON body (message text excluded; error codes, exception type, and stack trace only).
-- External `$schema` fetching off by default; HTTPS-only with dangerous-redirect blocking, DNS-resolution checks (including IPv4-mapped IPv6), and connection pinning to validated addresses when enabled.
-- JSON to XML / XML to JSON and JSON to YAML / YAML to JSON conversion with pre-save preview and Conversion warnings tab. XXE-safe XML reading.
-- Failed conversions and cancelled previews never modify any file.
-- Settings persist language, window placement, backup behavior, external schema permission, bracket completion, schema search paths, and recent files; broken settings are moved aside and defaults load.
-- Recent Files keeps up to 10 paths, can be cleared, and removes missing files when selected. Drag-and-drop open.
-- UTF-8, UTF-8 BOM, UTF-16 LE, and UTF-16 BE are detected and preserved on save; CRLF/LF is preserved by majority detection. Unknown extensions are sniffed.
-- File logs are written under `%LocalAppData%\VisualJson\logs` without document or schema body content.
+- AvalonEdit-based text editing with folding, search/replace (regex), key completion (Ctrl+Space), and virtualized rendering for multi-MB documents.
+- Hierarchical grid editing with JSON Pointer paths, filtering, drag-and-drop (including across parents), duplicate, and undo/redo.
+- Table View for object-majority arrays (up to 10,000 rows) with per-cell editing, `+ Row` / `+ Column`, display sorting, and "Apply to Structure".
+- JSON Schema validation (practical keyword subset incl. `const`, length limits, same-document `$ref`, `format` warnings) with click-to-jump diagnostics and a schema definition view.
+- JSON ⇔ XML and JSON ⇔ YAML conversion with mandatory previews; failed or cancelled conversions never touch any file. XXE-safe XML reading.
+- Save safety: strict validation before save, temp-file replacement, generation backups, and recovery snapshots. Encoding (UTF-8/UTF-8 BOM/UTF-16 LE/BE) and newline style are preserved.
+- English/Japanese UI switching.
 
-## Known Limitations
+## Known limitations
 
-- JSONC/JSON5 comments are not preserved after formatting, grid synchronization, save, or conversion (best effort).
-- JSON5 support is limited to representative syntax, not the full JSON5 language.
-- JSON Lines is handled as an array-equivalent document; the saved line format does not preserve blank lines or original per-line formatting.
-- Schema validation supports the listed keyword subset; `allOf`/`anyOf`/`oneOf`, `$id`, and remote `$ref` are not supported.
-- Table View sorting compares values type-aware (missing < null < boolean < number < string < containers); container cells are read-only summaries.
-- YAML to JSON supports a representative block-style subset; anchors, aliases, tags, block scalars, and non-empty flow collections are rejected.
-- XML to JSON keeps values as strings by default.
-- Files of 50MB or larger open in text mode with full grid editing disabled for the session.
-- 100MB-class full grid editing is not guaranteed.
-- BSON, split view, and multiple tabs remain later-phase candidates.
-- The Windows package is unsigned; SmartScreen may warn on first launch. Verify the SHA256 checksum.
-- Lines longer than about 8,000 characters are rendered without token coloring to preserve responsiveness.
+Unchanged from 1.2.0 — see the Limitations section in [README.md](README.md).
+
+## Verification
+
+- Unit/integration: `dotnet test` 94/94 pass (TRX recorded).
+- Regression: the full Phase 2 acceptance harness (real-window automation across text/grid/table/schema/conversion/save flows) passes with exit code 0.
+- Package: `verify-release-package.ps1` passes all checks including the docs-exclusion scan.
+
+The Windows ZIP includes README (EN/JA), LICENSE, NOTICE, CONTRIBUTING, third-party notices, CHANGELOG, these release notes, samples, and demo assets. Corresponding source is available from the `v1.3.0` GitHub tag.

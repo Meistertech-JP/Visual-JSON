@@ -7,7 +7,7 @@
 
 ## AvalonEdit
 
-Visual JSON 1.2.0 includes AvalonEdit as a third-party component.
+Visual JSON 1.3.0 includes AvalonEdit as a third-party component.
 
 - Project: https://github.com/icsharpcode/AvalonEdit
 - Copyright (c) AlphaSierraPapa for the SharpDevelop Team

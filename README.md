@@ -17,7 +17,7 @@ A Windows-first JSON editor built with VB.NET and WPF. Edit JSON as text or as a
 | XML/YAML conversion preview | Partial | Partial | Built in |
 | Pre-save validation / backup / recovery | Partial | No | Built in |
 
-\* Schema validation covers a practical subset of JSON Schema keywords; `allOf`/`anyOf`/`oneOf`, `$id`, and remote `$ref` are not supported. See [Limitations](#limitations-v120).
+\* Schema validation covers a practical subset of JSON Schema keywords; `allOf`/`anyOf`/`oneOf`, `$id`, and remote `$ref` are not supported. See [Limitations](#limitations-v130).
 
 ## Sample Files
 
@@ -43,7 +43,7 @@ The [`samples/`](samples/) folder is included so you can see the value quickly:
 - **Safe conversion** — JSON ⇔ XML and JSON ⇔ YAML with a mandatory preview; a cancelled or failed conversion never touches any file.
 - **English / Japanese UI** — switch the entire UI, including the message pane and Table View, at runtime.
 
-## Features (v1.2.0)
+## Features (v1.3.0)
 
 ### Text editing
 
@@ -90,7 +90,7 @@ The [`samples/`](samples/) folder is included so you can see the value quickly:
 
 ## Getting started
 
-Download `visual-json-v1.2.0-win-x64.zip`, verify the SHA256 checksum shipped next to it, extract, and run `VisualJson.App.exe`. The package is self-contained — no .NET installation is required. The binary is unsigned, so SmartScreen may warn on first launch.
+Download `visual-json-v1.3.0-win-x64.zip`, verify the SHA256 checksum shipped next to it, extract, and run `VisualJson.App.exe`. The package is self-contained — no .NET installation is required. The binary is unsigned, so SmartScreen may warn on first launch.
 
 ## Building from source
 
@@ -103,14 +103,14 @@ dotnet build VisualJson.slnx
 # Run
 dotnet run --project src\VisualJson.App\VisualJson.App.vbproj
 
-# Test
-dotnet run --project tests\VisualJson.Tests\VisualJson.Tests.vbproj
+# Test (MSTest)
+dotnet test tests\VisualJson.Tests\VisualJson.Tests.vbproj
 
 # Package (outputs zip + sha256 under artifacts/)
 .\scripts\package-windows-x64.ps1
 ```
 
-## Limitations (v1.2.0)
+## Limitations (v1.3.0)
 
 - JSONC / JSON5 input is normalized to standard JSON for parsing. Comments are not preserved after formatting, grid sync, save, or conversion (best effort by design).
 - JSON5 support covers representative syntax (comments, single-quoted strings, unquoted keys, trailing commas), not the full JSON5 language.
@@ -125,4 +125,4 @@ dotnet run --project tests\VisualJson.Tests\VisualJson.Tests.vbproj
 
 ## License
 
-Source code is licensed under the Mozilla Public License Version 2.0 (MPL-2.0); see [LICENSE](LICENSE). Corresponding Source Code Form for executable packages is available from the matching GitHub tag, for example [`v1.2.0`](https://github.com/Meistertech-JP/Visual-JSON/tree/v1.2.0). The Visual JSON name, logo, screenshots, demo GIFs, image assets, and project branding are reserved and are not licensed under the MPL-2.0; see [NOTICE.md](NOTICE.md). AvalonEdit remains licensed separately under MIT; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). External contributions use DCO sign-off; see [CONTRIBUTING.md](CONTRIBUTING.md).
+Source code is licensed under the Mozilla Public License Version 2.0 (MPL-2.0); see [LICENSE](LICENSE). Corresponding Source Code Form for executable packages is available from the matching GitHub tag, for example [`v1.3.0`](https://github.com/Meistertech-JP/Visual-JSON/tree/v1.3.0). The Visual JSON name, logo, screenshots, demo GIFs, image assets, and project branding are reserved and are not licensed under the MPL-2.0; see [NOTICE.md](NOTICE.md). AvalonEdit remains licensed separately under MIT; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). External contributions use DCO sign-off; see [CONTRIBUTING.md](CONTRIBUTING.md).

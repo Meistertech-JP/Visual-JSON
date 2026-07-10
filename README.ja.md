@@ -34,7 +34,7 @@ English version: see [README.md](README.md).
 | --- | --- |
 | ![Visual JSON Table View showing an editable object-array table](assets/screenshots/table-view.png) | ![Visual JSON Schema diagnostics showing validation errors with pointers and schema paths](assets/screenshots/schema-diagnostics.png) |
 
-## 機能 (v1.2.0)
+## 機能 (v1.3.0)
 
 ### JSON編集コア (MVP-0)
 
@@ -102,7 +102,7 @@ English version: see [README.md](README.md).
 - XML Exportのプレビューでオプションを選べます: 配列は `<item>` 要素(既定)/親名の繰り返し、nullは空要素(既定)/`xsi:nil="true"`。変更すると即時に再変換され、設定は保存されません。
 - JSON Lines文書は1行1コンパクトJSONの行形式で保存します。エディタ表示は従来どおり配列相当の標準JSONです。互換性の注意はリリースノートを参照してください。
 
-## 制限 (v1.2.0)
+## 制限 (v1.3.0)
 
 - JSONC / JSON5 は読み取り時に標準JSONへ正規化します。整形、グリッド同期、保存、変換後にコメントは保持されません(仕様上 best effort)。
 - JSON5 対応は代表構文(コメント、シングルクォート文字列、未引用キー、末尾カンマ)に限定します。完全なJSON5エンジンではありません。
@@ -132,7 +132,7 @@ dotnet run --project src\VisualJson.App\VisualJson.App.vbproj
 ## テスト
 
 ```powershell
-dotnet run --project tests\VisualJson.Tests\VisualJson.Tests.vbproj
+dotnet test tests\VisualJson.Tests\VisualJson.Tests.vbproj
 ```
 
 ## パッケージ作成
@@ -143,9 +143,9 @@ dotnet run --project tests\VisualJson.Tests\VisualJson.Tests.vbproj
 
 成果物は `artifacts/` に出力されます。
 
-- `visual-json-v1.2.0-win-x64.zip`
-- `visual-json-v1.2.0-win-x64.sha256`
+- `visual-json-v1.3.0-win-x64.zip`
+- `visual-json-v1.3.0-win-x64.sha256`
 
 ## ライセンス
 
-ソースコードは Mozilla Public License Version 2.0 (MPL-2.0) です。詳細は [LICENSE](LICENSE) を参照してください。実行形式パッケージに対応する Source Code Form は、対応するGitHubタグ、たとえば [`v1.2.0`](https://github.com/Meistertech-JP/Visual-JSON/tree/v1.2.0) から取得できます。Visual JSON の名称、ロゴ、スクリーンショット、デモGIF、画像素材、プロジェクトのブランド表現は MPL-2.0 の対象外で、権利留保です。詳細は [NOTICE.md](NOTICE.md) を参照してください。AvalonEdit は MIT License のまま別枠です。詳細は [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) を参照してください。外部コントリビューションは DCO sign-off を必要とします。詳細は [CONTRIBUTING.md](CONTRIBUTING.md) を参照してください。
+ソースコードは Mozilla Public License Version 2.0 (MPL-2.0) です。詳細は [LICENSE](LICENSE) を参照してください。実行形式パッケージに対応する Source Code Form は、対応するGitHubタグ、たとえば [`v1.3.0`](https://github.com/Meistertech-JP/Visual-JSON/tree/v1.3.0) から取得できます。Visual JSON の名称、ロゴ、スクリーンショット、デモGIF、画像素材、プロジェクトのブランド表現は MPL-2.0 の対象外で、権利留保です。詳細は [NOTICE.md](NOTICE.md) を参照してください。AvalonEdit は MIT License のまま別枠です。詳細は [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) を参照してください。外部コントリビューションは DCO sign-off を必要とします。詳細は [CONTRIBUTING.md](CONTRIBUTING.md) を参照してください。
