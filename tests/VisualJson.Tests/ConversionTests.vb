@@ -241,6 +241,7 @@ Public Class ConversionTests
             service.ConvertYamlToJson("secretkey: 1" & Environment.NewLine & "secretkey: 2")
             Throw New InvalidOperationException("duplicate key unexpectedly accepted")
         Catch ex As InvalidOperationException When ex.Message.Contains("Duplicate mapping key", StringComparison.Ordinal)
+            ' Expected: capture the sanitized duplicate-key error for the assertions below.
             thrown = ex
         End Try
 

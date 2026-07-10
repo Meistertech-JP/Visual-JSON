@@ -140,6 +140,7 @@ Public Class FileSafetyTests
         Try
             Throw New InvalidOperationException("""secret-outer"":1", inner)
         Catch caught As Exception
+            ' Expected: capture a stack-bearing exception for the sanitizer assertions below.
             ex = caught
         End Try
 

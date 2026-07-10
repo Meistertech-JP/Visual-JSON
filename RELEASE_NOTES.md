@@ -9,7 +9,7 @@ This is an **internal-quality release**: it contains no new user-facing features
 - **Reproducible builds.** GitHub Actions now restores, builds, tests, packages, and verifies the release zip on every push and pull request, uploading the zip, checksum, and test results as artifacts. Because the binaries are unsigned, this reproducibility plus the published SHA256 is the trust basis for the download.
 - **Verified packaging.** A new verification script checks every release zip: checksum matches, all public documents present, README links resolve inside the zip, the application executable exists, and internal specification documents are never bundled.
 - **Tighter network guard.** The external-schema URL guard (still **off by default**) additionally blocks CGNAT (`100.64.0.0/10`), IPv4 multicast/reserved ranges, IPv6 unspecified/multicast, and 6to4/Teredo addresses whose embedded IPv4 falls in a blocked range.
-- **Exception-handling audit.** All 45 `Catch` blocks were classified; none silently swallow data-affecting errors. Intentional ignores carry reason comments, and two schema-probe failures that previously vanished are now recorded in the file log (types and stack traces only — never document content).
+- **Exception-handling audit.** All 60 `Catch` blocks across source, tools, and tests were classified; none silently swallow data-affecting errors. Intentional ignores carry reason comments, and two schema-probe failures that previously vanished are now recorded in the file log (types and stack traces only — never document content).
 - **Honest documentation.** The README comparison table now footnotes that schema validation covers a practical keyword subset, matching the Limitations section, in both English and Japanese.
 
 ## Compatibility

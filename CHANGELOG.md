@@ -15,7 +15,7 @@ Internal-quality release: no user-facing feature changes. The structure changed;
 - Added GitHub Actions CI (`build-test-package.yml`): restore, build, test with TRX, package, release-zip verification, and artifact upload on main pushes, pull requests, and manual dispatch. `global.json` pins the SDK feature band.
 - Added `scripts/verify-release-package.ps1`: checks the zip/sha256 pair (hash recomputed), required public documents, README link integrity inside the zip, the application executable, and that `docs/` is never bundled — with a self-test covering the failure cases on every CI run.
 - Hardened the external-schema URL guard: CGNAT `100.64.0.0/10`, IPv4 multicast/reserved (`224.0.0.0/4`, `240.0.0.0/4`), IPv6 unspecified/multicast, and embedded-IPv4 re-checking for 6to4 (`2002::/16`) and Teredo (`2001:0::/32`). External fetching remains off by default.
-- Audited all 45 `Catch` blocks (classification recorded; zero forbidden swallows): every intentional ignore now carries a reason comment, and two previously silent schema-probe failures now write typed file-log entries.
+- Audited all 60 `Catch` blocks across source, tools, and tests (classification recorded; zero forbidden swallows): every intentional ignore carries a reason comment, and two previously silent schema-probe failures now write typed file-log entries.
 - Aligned the README comparison table with the Limitations section (schema validation is a practical keyword subset) in both English and Japanese.
 
 ## 1.2.0
