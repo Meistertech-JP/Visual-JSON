@@ -1,0 +1,56 @@
+[
+  {
+    "id": 1001,
+    "name": "Mina Tanaka",
+    "email": "mina@example.com",
+    "role": "admin",
+    "active": true,
+    "createdAt": "2026-07-01T10:30:00Z",
+    "profile": {
+      "department": "Engineering",
+      "timezone": "Asia/Tokyo"
+    },
+    "tags": [
+      "beta",
+      "schema"
+    ]
+  },
+  {
+    "id": 1002,
+    "name": "Zoe Rivera",
+    "email": "zoe@example.com",
+    "role": "editor",
+    "active": true,
+    "createdAt": "2026-07-03T14:05:00Z",
+    "profile": {
+      "department": "Operations",
+      "timezone": "America/Los_Angeles"
+    }
+  },
+  {
+    "id": 1003,
+    "name": "Kai Morgan",
+    "email": "kai@example.com",
+    "role": "viewer",
+    "active": false,
+    "createdAt": "2026-07-08T08:45:00Z",
+    "profile": {
+      "department": "Support",
+      "timezone": "Europe/London"
+    },
+    "lastLoginAt": null
+  },
+  {
+    "id": 1004,
+    "name": "Avery Chen",
+    "email": "avery@example.com",
+    "role": "editor",
+    "active": true,
+    "createdAt": "2026-07-09T16:20:00Z",
+    "profile": {
+      "department": "Product",
+      "timezone": "Asia/Singapore"
+    },
+    "quota": 250
+  }
+]

@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Visual JSON sample user",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "email",
+    "role",
+    "active",
+    "createdAt",
+    "profile"
+  ],
+  "properties": {
+    "id": {
+      "type": "number"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 2
+    },
+    "email": {
+      "type": "string",
+      "format": "email"
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "admin",
+        "editor",
+        "viewer"
+      ]
+    },
+    "active": {
+      "type": "boolean"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "profile": {
+      "type": "object",
+      "required": [
+        "age",
+        "department",
+        "timezone"
+      ],
+      "properties": {
+        "age": {
+          "type": "number",
+          "minimum": 0
+        },
+        "department": {
+          "type": "string",
+          "minLength": 2
+        },
+        "timezone": {
+          "type": "string",
+          "minLength": 3
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "id": "usr-042",
+  "name": "Zoe Rivera",
+  "email": "not-an-email",
+  "role": "owner",
+  "active": "yes",
+  "createdAt": "2026-07-10T09:15:00Z",
+  "profile": {
+    "age": -1,
+    "department": "Operations",
+    "timezone": "Asia/Tokyo"
+  },
+  "preferences": {
+    "newsletter": true,
+    "channels": [
+      "email",
+      "slack"
+    ]
+  }
+}

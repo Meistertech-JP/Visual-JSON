@@ -1,0 +1,4 @@
+{"timestamp":"2026-07-10T09:00:00Z","type":"user.created","userId":1001,"source":"api","ok":true}
+{"timestamp":"2026-07-10T09:03:12Z","type":"user.updated","userId":1002,"source":"grid","fields":["email","role"],"ok":true}
+{"timestamp":"2026-07-10T09:05:45Z","type":"schema.warning","userId":1003,"source":"schema","message":"format email is advisory","ok":true}
+{"timestamp":"2026-07-10T09:08:30Z","type":"export.preview","format":"xml","cancelled":true,"originalFileTouched":false}

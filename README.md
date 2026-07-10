@@ -4,6 +4,28 @@ A Windows-first JSON editor built with VB.NET and WPF. Edit JSON as text or as a
 
 日本語版は [README.ja.md](README.ja.md) を参照してください。
 
+![Visual JSON workflow demo: deep JSON, grid pointer sync, table editing, schema jump, and safe conversion preview](assets/demo/visual-json-workflow.gif)
+
+## Why Visual JSON
+
+| Feature | VS Code | Online JSON tools | Visual JSON |
+| --- | --- | --- | --- |
+| Local-only workflow | Yes | No | Yes |
+| Grid editing | Extension-dependent | Limited | Built in |
+| Table View | Limited | Limited | Built in |
+| Schema diagnostic jump | Yes | Partial | Yes |
+| XML/YAML conversion preview | Partial | Partial | Built in |
+| Pre-save validation / backup / recovery | Partial | No | Built in |
+
+## Sample Files
+
+The [`samples/`](samples/) folder is included so you can see the value quickly:
+
+- [`api-response-invalid.json`](samples/api-response-invalid.json): open it with [`schema/user.schema.json`](samples/schema/user.schema.json) to try schema diagnostics and click-to-jump.
+- [`users-array.json`](samples/users-array.json): switch to Grid, open Table View, sort, and edit a scalar cell.
+- [`config.jsonc`](samples/config.jsonc): try JSONC comments, trailing commas, validation, and formatting.
+- [`events.jsonl`](samples/events.jsonl): open JSON Lines as an array-equivalent document and save back as line format.
+
 ## Screenshots
 
 | Table View | Schema diagnostics |
@@ -101,4 +123,4 @@ dotnet run --project tests\VisualJson.Tests\VisualJson.Tests.vbproj
 
 ## License
 
-Source code is licensed under the Mozilla Public License Version 2.0 (MPL-2.0); see [LICENSE](LICENSE). The Visual JSON name, logo, screenshots, and project branding are reserved and are not licensed under the MPL-2.0; see [NOTICE.md](NOTICE.md). AvalonEdit remains licensed separately under MIT; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). External contributions use DCO sign-off; see [CONTRIBUTING.md](CONTRIBUTING.md).
+Source code is licensed under the Mozilla Public License Version 2.0 (MPL-2.0); see [LICENSE](LICENSE). Corresponding Source Code Form for executable packages is available from the matching GitHub tag, for example [`v1.2.0`](https://github.com/Meistertech-JP/Visual-JSON/tree/v1.2.0). The Visual JSON name, logo, screenshots, demo GIFs, image assets, and project branding are reserved and are not licensed under the MPL-2.0; see [NOTICE.md](NOTICE.md). AvalonEdit remains licensed separately under MIT; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). External contributions use DCO sign-off; see [CONTRIBUTING.md](CONTRIBUTING.md).

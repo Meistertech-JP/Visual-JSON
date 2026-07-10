@@ -55,6 +55,7 @@ $publicDocs = @(
     "README.ja.md",
     "LICENSE",
     "NOTICE.md",
+    "CONTRIBUTING.md",
     "THIRD_PARTY_NOTICES.md",
     "CHANGELOG.md",
     "RELEASE_NOTES.md"
@@ -69,6 +70,14 @@ foreach ($doc in $publicDocs) {
     Copy-Item -LiteralPath $source -Destination $publishRoot
 }
 
+$samplesSource = Join-Path $repoRoot "samples"
+if (Test-Path -LiteralPath $samplesSource) {
+    Copy-Item -LiteralPath $samplesSource -Destination $publishRoot -Recurse
+}
+$assetsSource = Join-Path $repoRoot "assets"
+if (Test-Path -LiteralPath $assetsSource) {
+    Copy-Item -LiteralPath $assetsSource -Destination $publishRoot -Recurse
+}
 if (Test-Path -LiteralPath $zipPath) {
     Remove-Item -LiteralPath $zipPath -Force
 }

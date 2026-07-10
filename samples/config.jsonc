@@ -1,0 +1,17 @@
+{
+  // Visual JSON accepts representative JSONC input.
+  "environment": "local",
+  "features": {
+    "schemaDiagnostics": true,
+    "tableView": true,
+    "safeConversionPreview": true,
+  },
+  "paths": [
+    "./samples",
+    "./schema",
+  ],
+  "limits": {
+    "tableRows": 10000,
+    "gridDisabledAtMb": 50,
+  },
+}

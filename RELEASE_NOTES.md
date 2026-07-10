@@ -13,6 +13,8 @@ This release completes Phase 2 (R2): a Table View for object arrays, cross-paren
 - Key completion (Ctrl+Space in text mode): suggests keys used by sibling objects in the same array plus schema `properties`, minus existing keys, and inserts `"key": ` from the keyboard.
 - XML export options in the preview: arrays as repeated `<item>` elements (default) or repeated parent-name elements; `null` as an empty element (default) or `xsi:nil="true"` with the `xmlns:xsi` declaration. Options are not persisted; every export starts from the defaults.
 - JSON Lines documents are now saved in line format: one compact JSON per line. The editor continues to display the array-form standard JSON.
+- Sample files are included under `samples/` for Table View, JSONC, JSON Lines, and schema-diagnostic workflows.
+- The Windows ZIP includes README, LICENSE, NOTICE, CONTRIBUTING, third-party notices, samples, and demo assets. Corresponding source is available from the `v1.2.0` GitHub tag.
 - Fixed a latent v1.1.0 issue where a JSON Lines document could no longer be revalidated or saved after a grid edit.
 
 ## Compatibility Notes
