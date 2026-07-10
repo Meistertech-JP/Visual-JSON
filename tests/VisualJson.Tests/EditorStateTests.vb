@@ -71,7 +71,7 @@ Public Class EditorStateTests
         AssertEqual(256.75, state.TextScrollOffset, "scroll offset")
     End Sub
 
-    <TestMethod(DisplayName:="UT-P2-STA-006 10MB formatted offset lookup p95 stays within 200ms")>
+    <TestMethod(DisplayName:="UT-P2-STA-006 10MB formatted state restore and offset lookup p95 stays within 200ms")>
     Public Sub P2TenMbFormattedOffsetLookupWithin200Ms()
         Dim parser = New JsonParserService()
         Dim formatter = New JsonFormatterService()
@@ -84,6 +84,10 @@ Public Class EditorStateTests
             Math.Max(0, formatted.LastIndexOf("""payload""", StringComparison.Ordinal))
         }
 
+        Dim selectedNode = stateService.FindNodeAtOffset(root, offsets(offsets.Length - 1))
+        AssertTrue(selectedNode IsNot Nothing, "selected node for state restore")
+        Dim warmState = stateService.CreateState(selectedNode.JsonPointer, {selectedNode.JsonPointer}, selectedNode.JsonPointer)
+        stateService.ResolveRestoreTarget(root, warmState)
         For Each offset In offsets
             stateService.FindNodeAtOffset(root, offset)
         Next
@@ -91,19 +95,24 @@ Public Class EditorStateTests
         Dim samples As New List(Of Double)()
         Dim timer = New Stopwatch()
         For iteration = 0 To 19
+            timer.Restart()
+            Dim state = stateService.CreateState(selectedNode.JsonPointer, {selectedNode.JsonPointer}, selectedNode.JsonPointer)
+            Dim restoredNode = stateService.ResolveRestoreTarget(root, state)
+            Dim allOffsetsFound = True
             For Each offset In offsets
-                timer.Restart()
                 Dim node = stateService.FindNodeAtOffset(root, offset)
-                timer.Stop()
-                AssertTrue(node IsNot Nothing, "offset lookup returns node")
-                samples.Add(timer.Elapsed.TotalMilliseconds)
+                allOffsetsFound = allOffsetsFound AndAlso node IsNot Nothing
             Next
+            timer.Stop()
+            AssertTrue(restoredNode IsNot Nothing, "state restore returns node")
+            AssertTrue(allOffsetsFound, "offset lookups return nodes")
+            samples.Add(timer.Elapsed.TotalMilliseconds)
         Next
 
         samples.Sort()
         Dim p95Index = Math.Max(0, CInt(Math.Ceiling(samples.Count * 0.95)) - 1)
         Dim p95 = samples(p95Index)
-        AssertTrue(p95 < 200, $"offset lookup p95 {p95:n1}ms")
+        AssertTrue(p95 < 200, $"state restore and offset lookup p95 {p95:n1}ms")
     End Sub
 
     <TestMethod(DisplayName:="UT-P2-FLD-001 folding ignores braces in strings and handles nesting")>
