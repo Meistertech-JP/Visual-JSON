@@ -465,7 +465,7 @@ Partial Class MainWindow
 
         SetGridItems(visibleRoot, restoreState, targetPointer, bringIntoView, recordState)
         JsonTree.IsEnabled = Not _gridDisabled AndAlso recordState
-        NodeCountStatusText.Text = $"{_treeStats.CountNodes(root)} nodes"
+        Document.NodeCount = _treeStats.CountNodes(root)
         RebindTableView(root)
     End Sub
 
@@ -527,12 +527,12 @@ Partial Class MainWindow
             Dim restoreState = If(state, CaptureGridState(focusPointer))
             Dim text = _serializer.Serialize(Document.RootNode)
             SetEditorText(text)
-            Dim parsed = _parser.Parse(text, _currentFormat)
+            Dim parsed = _parser.Parse(text, Document.FormatKind)
             Dim targetPointer = If(focusPointer, restoreState.SelectedPointer)
             SetGridRoot(parsed.Root, restoreState, targetPointer, bringIntoView:=Not showText)
 
             Document.IsDirty = True
-            ParseStatusText.Text = "Valid JSON"
+            _viewModel.StatusText = "Valid JSON"
             ReplaceDiagnostics(Array.Empty(Of ValidationDiagnostic)())
             UpdateChrome()
             ScheduleRecoverySnapshot()
@@ -570,7 +570,7 @@ Partial Class MainWindow
         Dim visibleRoot = _gridFilter.Filter(Document.RootNode, query)
         SetGridItems(visibleRoot, _filterRestoreState, _filterRestoreState.SelectedPointer, bringIntoView:=False, recordState:=False)
         JsonTree.IsEnabled = False
-        NodeCountStatusText.Text = $"{_treeStats.CountNodes(Document.RootNode)} nodes"
+        Document.NodeCount = _treeStats.CountNodes(Document.RootNode)
     End Sub
 
     Private Function CanEditGrid(Optional showMessage As Boolean = True) As Boolean
@@ -672,6 +672,7 @@ Partial Class MainWindow
             Return False
         End If
 
+        _viewModel.CurrentMode = "Grid"
         _handlingTabSwitch = True
         Try
             EditorTabs.SelectedItem = GridTab
@@ -686,6 +687,7 @@ Partial Class MainWindow
     Private Sub ShowTextTab(Optional focusPointer As String = Nothing)
         SwitchGridToText(focusPointer)
 
+        _viewModel.CurrentMode = "Text"
         _handlingTabSwitch = True
         Try
             EditorTabs.SelectedItem = TextTab

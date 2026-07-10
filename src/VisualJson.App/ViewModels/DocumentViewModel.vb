@@ -1,20 +1,22 @@
 ' SPDX-License-Identifier: MPL-2.0
-Imports System.Collections.ObjectModel
-Imports VisualJson.Core.Diagnostics
+Imports VisualJson.Core.Infrastructure
 Imports VisualJson.Core.Models
+Imports VisualJson.Core.Parsing
 
 Namespace ViewModels
+    ''' Per-document state (FR-13-202): path, body text at document boundaries,
+    ''' dirty flag, input format, encoding/newline, and the parsed grid root.
+    ''' Diagnostics/log collections live on MessagePaneViewModel (FR-13-203).
     Public Class DocumentViewModel
         Inherits ObservableObject
 
         Private _currentFilePath As String = ""
         Private _isDirty As Boolean
+        Private _text As String = ""
+        Private _formatKind As JsonInputFormat = JsonInputFormat.StandardJson
+        Private _encoding As DetectedTextEncoding = DetectedTextEncoding.CreateDefault()
         Private _rootNode As JsonTreeNode
         Private _nodeCount As Integer
-        Private _parseStatus As String = "Not checked"
-
-        Public ReadOnly Property Diagnostics As New ObservableCollection(Of ValidationDiagnostic)()
-        Public ReadOnly Property Logs As New ObservableCollection(Of String)()
 
         Public Property CurrentFilePath As String
             Get
@@ -33,8 +35,57 @@ Namespace ViewModels
                 Return _isDirty
             End Get
             Set(value As Boolean)
-                SetProperty(_isDirty, value)
+                If SetProperty(_isDirty, value) Then
+                    OnPropertyChanged(NameOf(DirtyStatusDisplay))
+                End If
             End Set
+        End Property
+
+        ''' Document body synchronized at boundaries only (new/open/save/import) —
+        ''' AvalonEdit stays the live text authority; per-keystroke sync would copy
+        ''' multi-megabyte strings and regress NFR-13-PERF-001.
+        Public Property Text As String
+            Get
+                Return _text
+            End Get
+            Set(value As String)
+                If SetProperty(_text, If(value, "")) Then
+                    IsDirty = True
+                End If
+            End Set
+        End Property
+
+        Public Property FormatKind As JsonInputFormat
+            Get
+                Return _formatKind
+            End Get
+            Set(value As JsonInputFormat)
+                SetProperty(_formatKind, value)
+            End Set
+        End Property
+
+        Public Property Encoding As DetectedTextEncoding
+            Get
+                Return _encoding
+            End Get
+            Set(value As DetectedTextEncoding)
+                If SetProperty(_encoding, value) Then
+                    OnPropertyChanged(NameOf(EncodingName))
+                    OnPropertyChanged(NameOf(NewLineName))
+                End If
+            End Set
+        End Property
+
+        Public ReadOnly Property EncodingName As String
+            Get
+                Return _encoding.Name
+            End Get
+        End Property
+
+        Public ReadOnly Property NewLineName As String
+            Get
+                Return _encoding.NewLineName
+            End Get
         End Property
 
         Public Property RootNode As JsonTreeNode
@@ -51,17 +102,22 @@ Namespace ViewModels
                 Return _nodeCount
             End Get
             Set(value As Integer)
-                SetProperty(_nodeCount, value)
+                If SetProperty(_nodeCount, value) Then
+                    OnPropertyChanged(NameOf(NodeCountDisplay))
+                End If
             End Set
         End Property
 
-        Public Property ParseStatus As String
+        Public ReadOnly Property NodeCountDisplay As String
             Get
-                Return _parseStatus
+                Return $"{_nodeCount} nodes"
             End Get
-            Set(value As String)
-                SetProperty(_parseStatus, If(value, ""))
-            End Set
+        End Property
+
+        Public ReadOnly Property DirtyStatusDisplay As String
+            Get
+                Return If(_isDirty, "Unsaved", "Saved")
+            End Get
         End Property
 
         Public ReadOnly Property DisplayFilePath As String

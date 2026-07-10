@@ -185,6 +185,7 @@ Partial Class MainWindow
         BindTableModel(_tableModel)
         TablePanel.Visibility = Visibility.Visible
         GridTreePanel.Visibility = Visibility.Collapsed
+        _viewModel.CurrentMode = "Table"
         UpdatePointerStatus(node.JsonPointer)
         AddLog($"Table view opened for {node.PointerDisplay} ({_tableModel.Rows.Count} rows, {_tableModel.Columns.Count} columns).")
     End Sub
@@ -390,6 +391,7 @@ Partial Class MainWindow
         TableSubjectText.Text = ""
         TablePanel.Visibility = Visibility.Collapsed
         GridTreePanel.Visibility = Visibility.Visible
+        _viewModel.CurrentMode = "Grid"
 
         If selectPointer IsNot Nothing Then
             SelectPointerInGrid(selectPointer, bringIntoView:=True)

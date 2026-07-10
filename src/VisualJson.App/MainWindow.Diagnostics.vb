@@ -53,7 +53,7 @@ Partial Class MainWindow
 
     Private Sub CopyDiagnostics_Click(sender As Object, e As RoutedEventArgs)
         Dim version = Assembly.GetExecutingAssembly().GetName().Version?.ToString()
-        Dim report = _diagnosticsReport.CreateReport(version, Document.CurrentFilePath, CurrentText().Length, Document.Diagnostics, _lastException, _treeStats.CountNodes(Document.RootNode), "WPF", _language, GetFormatLabel(_currentFormat), _currentEncoding.Name, _currentEncoding.NewLineName)
+        Dim report = _diagnosticsReport.CreateReport(version, Document.CurrentFilePath, CurrentText().Length, _viewModel.Messages.SyntaxDiagnostics, _lastException, _treeStats.CountNodes(Document.RootNode), "WPF", _language, GetFormatLabel(Document.FormatKind), Document.Encoding.Name, Document.Encoding.NewLineName)
         Clipboard.SetText(report)
         AddLog("Diagnostics copied without JSON body.")
     End Sub
@@ -65,18 +65,18 @@ Partial Class MainWindow
     Private Function ValidateCurrentText(updateGrid As Boolean) As Boolean
         Try
             Dim text = CurrentText()
-            Dim diagnostics = _validator.Validate(text, _currentFormat)
+            Dim diagnostics = _validator.Validate(text, Document.FormatKind)
             ReplaceDiagnostics(diagnostics)
 
             If diagnostics.Count > 0 Then
-                ParseStatusText.Text = "Invalid JSON"
+                _viewModel.StatusText = "Invalid JSON"
                 Return False
             End If
 
-            ParseStatusText.Text = "Valid JSON"
+            _viewModel.StatusText = "Valid JSON"
             If updateGrid AndAlso Not _gridDisabled Then
                 Dim state = CaptureGridState()
-                Dim parsed = _parser.Parse(text, _currentFormat)
+                Dim parsed = _parser.Parse(text, Document.FormatKind)
                 SetGridRoot(parsed.Root, state, state.SelectedPointer, bringIntoView:=False)
             End If
 
@@ -86,7 +86,7 @@ Partial Class MainWindow
         Catch ex As Exception
             _lastException = ex
             ReplaceDiagnostics({New ValidationDiagnostic("Error", ex.Message)})
-            ParseStatusText.Text = "Invalid JSON"
+            _viewModel.StatusText = "Invalid JSON"
             AddLog($"Validation failed: {ex.Message}")
             Return False
         Finally
@@ -98,22 +98,22 @@ Partial Class MainWindow
         Dim capturedText = CurrentText()
 
         Try
-            Dim diagnostics = Await Task.Run(Function() _validator.Validate(capturedText, _currentFormat))
+            Dim diagnostics = Await Task.Run(Function() _validator.Validate(capturedText, Document.FormatKind))
             If Not String.Equals(capturedText, CurrentText(), StringComparison.Ordinal) Then
                 Return False
             End If
 
             ReplaceDiagnostics(diagnostics)
             If diagnostics.Count > 0 Then
-                ParseStatusText.Text = "Invalid JSON"
+                _viewModel.StatusText = "Invalid JSON"
                 UpdateChrome()
                 Return False
             End If
 
-            ParseStatusText.Text = "Valid JSON"
+            _viewModel.StatusText = "Valid JSON"
             If updateGrid AndAlso Not _gridDisabled Then
                 Dim state = CaptureGridState()
-                Dim parsed = Await Task.Run(Function() _parser.Parse(capturedText, _currentFormat))
+                Dim parsed = Await Task.Run(Function() _parser.Parse(capturedText, Document.FormatKind))
                 If String.Equals(capturedText, CurrentText(), StringComparison.Ordinal) Then
                     SetGridRoot(parsed.Root, state, state.SelectedPointer, bringIntoView:=False)
                 End If
@@ -126,7 +126,7 @@ Partial Class MainWindow
         Catch ex As Exception
             _lastException = ex
             ReplaceDiagnostics({New ValidationDiagnostic("Error", ex.Message)})
-            ParseStatusText.Text = "Invalid JSON"
+            _viewModel.StatusText = "Invalid JSON"
             UpdateChrome()
             AddLog($"Validation failed: {ex.Message}")
             Return False
@@ -134,13 +134,13 @@ Partial Class MainWindow
     End Function
 
     Private Sub ReplaceDiagnostics(items As IEnumerable(Of ValidationDiagnostic))
-        Document.Diagnostics.Clear()
+        _viewModel.Messages.SyntaxDiagnostics.Clear()
         For Each item In items
-            Document.Diagnostics.Add(item)
+            _viewModel.Messages.SyntaxDiagnostics.Add(item)
         Next
 
         ' Only updates the error-line marker set and invalidates visible lines; cheap at any size.
-        _editor.ApplySyntaxHighlighting(Document.Diagnostics)
+        _editor.ApplySyntaxHighlighting(_viewModel.Messages.SyntaxDiagnostics)
     End Sub
 
     Private Sub ScheduleValidation()
@@ -204,40 +204,26 @@ Partial Class MainWindow
     End Sub
 
     Private Sub UpdatePointerStatus(pointer As String)
-        If PointerStatusText Is Nothing Then
-            Return
-        End If
-
-        PointerStatusText.Text = $"Pointer: {DocumentStateService.ToPointerDisplay(pointer)}"
+        ' FileStatusText/DirtyStatusText/EncodingStatusText etc. update through
+        ' bindings on the view models; the pointer flows the same way (FR-13-201).
+        _viewModel.SelectedJsonPointer = pointer
     End Sub
 
     Private Sub UpdateChrome()
         Dim fileName = If(String.IsNullOrWhiteSpace(Document.CurrentFilePath), "Untitled", Path.GetFileName(Document.CurrentFilePath))
         Title = $"{fileName}{If(Document.IsDirty, " *", "")} - Visual JSON"
-        FileStatusText.Text = If(String.IsNullOrWhiteSpace(Document.CurrentFilePath), "Untitled", Document.CurrentFilePath)
-        DirtyStatusText.Text = If(Document.IsDirty, "Unsaved", "Saved")
-        UpdateDocumentMetadataStatus()
         UndoGridMenuItem.IsEnabled = _gridUndo.CanUndo()
         UndoGridButton.IsEnabled = _gridUndo.CanUndo()
         RedoGridMenuItem.IsEnabled = _gridUndo.CanRedo()
         RedoGridButton.IsEnabled = _gridUndo.CanRedo()
     End Sub
 
-    Private Sub UpdateDocumentMetadataStatus()
-        If EncodingStatusText IsNot Nothing Then
-            EncodingStatusText.Text = _currentEncoding.Name
-        End If
-        If NewLineStatusText IsNot Nothing Then
-            NewLineStatusText.Text = _currentEncoding.NewLineName
-        End If
-    End Sub
-
     Private Sub AddLog(message As String)
-        Document.Logs.Insert(0, $"{DateTime.Now:HH:mm:ss} {message}")
+        _viewModel.Messages.LogEntries.Insert(0, $"{DateTime.Now:HH:mm:ss} {message}")
     End Sub
 
     Private Sub AddConversionMessage(message As String)
-        ConversionList.Items.Insert(0, $"{DateTime.Now:HH:mm:ss} {message}")
+        _viewModel.Messages.ConversionDiagnostics.Insert(0, $"{DateTime.Now:HH:mm:ss} {message}")
     End Sub
 
 #End Region

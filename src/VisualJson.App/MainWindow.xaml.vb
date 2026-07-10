@@ -89,13 +89,11 @@ Public Class MainWindow
     Private _schemaSource As String
     Private _ignoreTextChanges As Boolean
     Private _lastException As Exception
-    Private _currentFormat As JsonInputFormat = JsonInputFormat.StandardJson
     Private _gridDisabled As Boolean
     Private _dragStartPoint As Point
     Private _dragNode As JsonTreeNode
     Private _language As String = "en"
     Private _settings As AppSettings = AppSettings.CreateDefault()
-    Private _currentEncoding As DetectedTextEncoding = DetectedTextEncoding.CreateDefault()
     Private _gridRootView As GridNodeViewModel
     Private _lastGridState As GridViewState
     Private _filterRestoreState As GridViewState
@@ -190,13 +188,16 @@ Public Class MainWindow
         InitializeComponent()
 
         DataContext = _viewModel
+        InitializeCommands()
         _editor = New TextEditorAdapter(JsonEditor)
         AddHandler JsonEditor.TextChanged, AddressOf JsonEditor_TextChanged
         AddHandler JsonEditor.TextArea.Caret.PositionChanged, AddressOf EditorCaret_PositionChanged
         AddHandler AllowExternalSchemaMenuItem.Checked, AddressOf SettingsControl_Changed
         AddHandler AllowExternalSchemaMenuItem.Unchecked, AddressOf SettingsControl_Changed
-        DiagnosticList.ItemsSource = Document.Diagnostics
-        LogList.ItemsSource = Document.Logs
+        DiagnosticList.ItemsSource = _viewModel.Messages.SyntaxDiagnostics
+        LogList.ItemsSource = _viewModel.Messages.LogEntries
+        SchemaList.ItemsSource = _viewModel.Messages.SchemaDiagnostics
+        ConversionList.ItemsSource = _viewModel.Messages.ConversionDiagnostics
 
         _validationTimer.Interval = TimeSpan.FromMilliseconds(500)
         AddHandler _validationTimer.Tick, AddressOf ValidationTimer_Tick

@@ -60,7 +60,7 @@ Partial Class MainWindow
     Private Sub ClearSchema_Click(sender As Object, e As RoutedEventArgs)
         _schemaText = Nothing
         _schemaSource = Nothing
-        SchemaList.ItemsSource = Nothing
+        _viewModel.Messages.SchemaDiagnostics.Clear()
         UpdateSchemaStatus()
         AddLog("Cleared schema.")
     End Sub
@@ -103,11 +103,15 @@ Partial Class MainWindow
         End If
 
         Try
-            Dim normalized = _preprocessor.Normalize(CurrentText(), _currentFormat)
-            Dim documentRoot = _parser.Parse(CurrentText(), _currentFormat).Root
+            Dim normalized = _preprocessor.Normalize(CurrentText(), Document.FormatKind)
+            Dim documentRoot = _parser.Parse(CurrentText(), Document.FormatKind).Root
             Dim diagnostics = _schemaValidation.Validate(normalized, _schemaText, _schemaSource, documentRoot)
 
-            SchemaList.ItemsSource = diagnostics
+            _viewModel.Messages.SchemaDiagnostics.Clear()
+            For Each diagnostic In diagnostics
+                _viewModel.Messages.SchemaDiagnostics.Add(diagnostic)
+            Next
+
             If showTab Then
                 MessageTabs.SelectedItem = SchemaResultTab
             End If
@@ -126,7 +130,7 @@ Partial Class MainWindow
 
     Private Function TryGetDollarSchemaUrl() As String
         Try
-            Dim normalized = _preprocessor.Normalize(CurrentText(), _currentFormat)
+            Dim normalized = _preprocessor.Normalize(CurrentText(), Document.FormatKind)
             Using document = Text.Json.JsonDocument.Parse(normalized)
                 If document.RootElement.ValueKind = Text.Json.JsonValueKind.Object Then
                     Dim schemaProperty As Text.Json.JsonElement = Nothing

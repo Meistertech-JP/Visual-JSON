@@ -207,26 +207,26 @@ Partial Class MainWindow
     Private Sub SetDocumentCore(text As String, filePath As String, isDirty As Boolean, format As JsonInputFormat, encodingInfo As DetectedTextEncoding)
         SetEditorText(If(text, ""))
         Document.CurrentFilePath = If(filePath, "")
+        ' Boundary sync (D-V13-2-A): the view model receives the body only at document
+        ' boundaries; setting Text marks the document dirty, so assign IsDirty after it.
+        Document.Text = If(text, "")
         Document.IsDirty = isDirty
         Document.RootNode = Nothing
         _gridRootView = Nothing
         _lastGridState = Nothing
         _filterRestoreState = Nothing
         _gridIsCurrent = False
-        _currentFormat = format
-        _currentEncoding = If(encodingInfo, DetectedTextEncoding.CreateDefault())
+        Document.FormatKind = format
+        Document.Encoding = If(encodingInfo, DetectedTextEncoding.CreateDefault())
         _gridDisabled = Not String.IsNullOrWhiteSpace(filePath) AndAlso File.Exists(filePath) AndAlso New FileInfo(filePath).Length >= 50L * 1024L * 1024L
         _gridUndo.Clear()
         GridFilterBox.Text = ""
         JsonTree.ItemsSource = New ObservableCollection(Of GridNodeViewModel)()
         JsonTree.IsEnabled = Not _gridDisabled
         ' Schema validation results belong to the previous document; the loaded schema is kept.
-        If SchemaList IsNot Nothing Then
-            SchemaList.ItemsSource = Nothing
-        End If
+        _viewModel.Messages.SchemaDiagnostics.Clear()
 
-        FileFormatStatusText.Text = GetFormatLabel(_currentFormat)
-        UpdateDocumentMetadataStatus()
+        FileFormatStatusText.Text = GetFormatLabel(Document.FormatKind)
         UpdateCaretStatus()
         UpdateChrome()
         ScheduleValidation()
@@ -295,15 +295,15 @@ Partial Class MainWindow
         End If
 
         Try
-            Dim formatted = _formatter.Format(CurrentText(), _currentFormat)
+            Dim formatted = _formatter.Format(CurrentText(), Document.FormatKind)
             Dim result As FileSaveResult
 
-            If _currentFormat = JsonInputFormat.JsonLines Then
+            If Document.FormatKind = JsonInputFormat.JsonLines Then
                 ' FR-P2-602: JSONL documents are saved one compact JSON per line
                 ' while the editor keeps showing the array-style standard JSON.
                 Dim parsed = _parser.Parse(formatted)
-                Dim lineResult = _jsonLines.Serialize(parsed.Root, If(_currentEncoding.NewLine = NewLineKind.CrLf, vbCrLf, vbLf))
-                result = _saveService.SaveRaw(Document.CurrentFilePath, lineResult.Text, _currentEncoding, _settings.BackupBeforeSave)
+                Dim lineResult = _jsonLines.Serialize(parsed.Root, If(Document.Encoding.NewLine = NewLineKind.CrLf, vbCrLf, vbLf))
+                result = _saveService.SaveRaw(Document.CurrentFilePath, lineResult.Text, Document.Encoding, _settings.BackupBeforeSave)
                 For Each warning In lineResult.Warnings
                     AddConversionMessage(warning)
                 Next
@@ -312,20 +312,21 @@ Partial Class MainWindow
                     MessageTabs.SelectedItem = ConversionTab
                 End If
             Else
-                result = _saveService.Save(Document.CurrentFilePath, formatted, _currentEncoding, _settings.BackupBeforeSave)
+                result = _saveService.Save(Document.CurrentFilePath, formatted, Document.Encoding, _settings.BackupBeforeSave)
             End If
 
-            SetEditorText(EncodingDetectionService.NormalizeNewLines(formatted, _currentEncoding.NewLine))
+            Dim savedText = EncodingDetectionService.NormalizeNewLines(formatted, Document.Encoding.NewLine)
+            SetEditorText(savedText)
+            Document.Text = savedText
             Document.IsDirty = False
             _recentFiles.Add(_settings, Document.CurrentFilePath)
             SaveSettings()
             RefreshRecentFilesMenu()
-            UpdateDocumentMetadataStatus()
             UpdateChrome()
             ScheduleValidation()
 
             AddLog($"Saved {Path.GetFileName(result.Path)}.")
-            _fileLog.Write("Save", $"{Path.GetFileName(result.Path)} encoding={_currentEncoding.Name} newline={_currentEncoding.NewLineName}")
+            _fileLog.Write("Save", $"{Path.GetFileName(result.Path)} encoding={Document.Encoding.Name} newline={Document.Encoding.NewLineName}")
             If Not String.IsNullOrWhiteSpace(result.BackupPath) Then
                 AddLog($"Backup created: {Path.GetFileName(result.BackupPath)}")
             End If

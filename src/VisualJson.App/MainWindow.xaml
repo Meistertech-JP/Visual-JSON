@@ -42,17 +42,17 @@
 
         <Menu Grid.Row="0">
             <MenuItem x:Name="FileMenu" Header="_File">
-                <MenuItem x:Name="NewMenuItem" Header="_New" InputGestureText="Ctrl+N" Click="New_Click"/>
-                <MenuItem x:Name="OpenMenuItem" Header="_Open..." InputGestureText="Ctrl+O" Click="Open_Click"/>
+                <MenuItem x:Name="NewMenuItem" Header="_New" InputGestureText="Ctrl+N" Command="{x:Static local:MainWindow.NewFileCommand}"/>
+                <MenuItem x:Name="OpenMenuItem" Header="_Open..." InputGestureText="Ctrl+O" Command="{x:Static local:MainWindow.OpenFileCommand}"/>
                 <MenuItem x:Name="RecentFilesMenuItem" Header="_Recent"/>
                 <Separator/>
-                <MenuItem x:Name="SaveMenuItem" Header="_Save" InputGestureText="Ctrl+S" Click="Save_Click"/>
-                <MenuItem x:Name="SaveAsMenuItem" Header="Save _As..." InputGestureText="Ctrl+Shift+S" Click="SaveAs_Click"/>
+                <MenuItem x:Name="SaveMenuItem" Header="_Save" InputGestureText="Ctrl+S" Command="{x:Static local:MainWindow.SaveFileCommand}"/>
+                <MenuItem x:Name="SaveAsMenuItem" Header="Save _As..." InputGestureText="Ctrl+Shift+S" Command="{x:Static local:MainWindow.SaveFileAsCommand}"/>
                 <Separator/>
                 <MenuItem x:Name="RecoverMenuItem" Header="_Recover Latest Snapshot" Click="RecoverLatest_Click"/>
                 <MenuItem x:Name="SettingsMenuItem" Header="S_ettings..." Click="Settings_Click"/>
                 <Separator/>
-                <MenuItem x:Name="ExitMenuItem" Header="E_xit" Click="Exit_Click"/>
+                <MenuItem x:Name="ExitMenuItem" Header="E_xit" Command="{x:Static local:MainWindow.ExitCommand}"/>
             </MenuItem>
             <MenuItem x:Name="EditMenu" Header="_Edit">
                 <MenuItem x:Name="ValidateMenuItem" Header="_Validate and Sync Text to Grid" InputGestureText="F5" Click="ValidateSync_Click"/>
@@ -93,10 +93,10 @@
         <Border Grid.Row="1" BorderBrush="#D4D4D8" BorderThickness="0,0,0,1" Background="#F4F4F5" Padding="8">
             <DockPanel LastChildFill="False">
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-                    <Button x:Name="NewButton" Style="{StaticResource ToolbarButton}" Content="New" Click="New_Click"/>
-                    <Button x:Name="OpenButton" Style="{StaticResource ToolbarButton}" Content="Open" Click="Open_Click"/>
-                    <Button x:Name="SaveButton" Style="{StaticResource ToolbarButton}" Content="Save" Click="Save_Click"/>
-                    <Button x:Name="SaveAsButton" Style="{StaticResource ToolbarButton}" Content="Save As" Click="SaveAs_Click"/>
+                    <Button x:Name="NewButton" Style="{StaticResource ToolbarButton}" Content="New" Command="{x:Static local:MainWindow.NewFileCommand}"/>
+                    <Button x:Name="OpenButton" Style="{StaticResource ToolbarButton}" Content="Open" Command="{x:Static local:MainWindow.OpenFileCommand}"/>
+                    <Button x:Name="SaveButton" Style="{StaticResource ToolbarButton}" Content="Save" Command="{x:Static local:MainWindow.SaveFileCommand}"/>
+                    <Button x:Name="SaveAsButton" Style="{StaticResource ToolbarButton}" Content="Save As" Command="{x:Static local:MainWindow.SaveFileAsCommand}"/>
                     <Button x:Name="ValidateButton" Style="{StaticResource ToolbarButton}" Content="Validate" Click="ValidateSync_Click"/>
                     <Button x:Name="FormatButton" Style="{StaticResource ToolbarButton}" Content="Format" Click="Format_Click"/>
                     <Button x:Name="ApplyGridButton" Style="{StaticResource ToolbarButton}" Content="Apply Grid" Click="ApplyGridToText_Click"/>
@@ -336,11 +336,11 @@
             </StatusBarItem>
             <Separator/>
             <StatusBarItem>
-                <TextBlock x:Name="EncodingStatusText" Text="UTF-8"/>
+                <TextBlock x:Name="EncodingStatusText" Text="{Binding ActiveDocument.EncodingName}"/>
             </StatusBarItem>
             <Separator/>
             <StatusBarItem>
-                <TextBlock x:Name="NewLineStatusText" Text="LF"/>
+                <TextBlock x:Name="NewLineStatusText" Text="{Binding ActiveDocument.NewLineName}"/>
             </StatusBarItem>
             <Separator/>
             <StatusBarItem>
@@ -348,19 +348,19 @@
             </StatusBarItem>
             <Separator/>
             <StatusBarItem>
-                <TextBlock x:Name="PointerStatusText" Text="Pointer: (root)"/>
+                <TextBlock x:Name="PointerStatusText" Text="{Binding PointerDisplayText}"/>
             </StatusBarItem>
             <Separator/>
             <StatusBarItem>
-                <TextBlock x:Name="NodeCountStatusText" Text="0 nodes"/>
+                <TextBlock x:Name="NodeCountStatusText" Text="{Binding ActiveDocument.NodeCountDisplay}"/>
             </StatusBarItem>
             <Separator/>
             <StatusBarItem>
-                <TextBlock x:Name="ParseStatusText" Text="Not checked"/>
+                <TextBlock x:Name="ParseStatusText" Text="{Binding StatusText}"/>
             </StatusBarItem>
             <Separator/>
             <StatusBarItem>
-                <TextBlock x:Name="DirtyStatusText" Text="Saved"/>
+                <TextBlock x:Name="DirtyStatusText" Text="{Binding ActiveDocument.DirtyStatusDisplay}"/>
             </StatusBarItem>
             <Separator/>
             <StatusBarItem>
@@ -368,7 +368,7 @@
             </StatusBarItem>
             <Separator/>
             <StatusBarItem>
-                <TextBlock x:Name="FileStatusText" Text="Untitled"/>
+                <TextBlock x:Name="FileStatusText" Text="{Binding ActiveDocument.DisplayFilePath}"/>
             </StatusBarItem>
         </StatusBar>
     </Grid>

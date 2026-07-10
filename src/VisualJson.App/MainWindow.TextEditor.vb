@@ -49,9 +49,9 @@ Partial Class MainWindow
         Try
             Dim caretPointer = If(Document.RootNode Is Nothing, "", _documentState.GetPointerAtOffset(Document.RootNode, _editor.GetCaretOffset()))
             Dim state = CaptureGridState(caretPointer)
-            Dim formatted = _formatter.Format(CurrentText(), _currentFormat)
+            Dim formatted = _formatter.Format(CurrentText(), Document.FormatKind)
             SetEditorText(formatted)
-            Dim parsed = _parser.Parse(formatted, _currentFormat)
+            Dim parsed = _parser.Parse(formatted, Document.FormatKind)
             SetGridRoot(parsed.Root, state, caretPointer, bringIntoView:=False)
             MoveTextCaretToPointer(caretPointer)
             ScheduleFoldingUpdate()
@@ -281,7 +281,7 @@ Partial Class MainWindow
         _editor.SetCaretOffset(Math.Min(result.NextOffset, result.Text.Length))
         Document.IsDirty = True
         _gridIsCurrent = False
-        ParseStatusText.Text = "Not checked"
+        _viewModel.StatusText = "Not checked"
         UpdateCaretStatus()
         UpdateSearchHighlights()
         UpdateChrome()

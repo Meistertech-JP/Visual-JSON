@@ -417,15 +417,15 @@ Partial Class MainWindow
     End Function
 
     Public Function GetEncodingNameForAutomation() As String
-        Return _currentEncoding.Name
+        Return Document.Encoding.Name
     End Function
 
     Public Function GetNewLineNameForAutomation() As String
-        Return _currentEncoding.NewLineName
+        Return Document.Encoding.NewLineName
     End Function
 
     Public Function GetFormatLabelForAutomation() As String
-        Return GetFormatLabel(_currentFormat)
+        Return GetFormatLabel(Document.FormatKind)
     End Function
 
     Public Function HasGridContextMenuForAutomation() As Boolean

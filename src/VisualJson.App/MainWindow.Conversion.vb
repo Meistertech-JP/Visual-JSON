@@ -48,11 +48,11 @@ Partial Class MainWindow
         End If
 
         Try
-            Dim standardJson = _formatter.Format(CurrentText(), _currentFormat)
+            Dim standardJson = _formatter.Format(CurrentText(), Document.FormatKind)
             Dim result = If(toXml, _xmlConversion.ConvertJsonToXml(standardJson), _yamlConversion.ConvertJsonToYaml(standardJson))
 
             Dim commentWarning = LocalText("Comments are not preserved in the conversion output (best effort).", "コメントは変換結果に保持されません(best effort)。")
-            Dim hasCommentWarning = _currentFormat = JsonInputFormat.JsonC OrElse _currentFormat = JsonInputFormat.Json5
+            Dim hasCommentWarning = Document.FormatKind = JsonInputFormat.JsonC OrElse Document.FormatKind = JsonInputFormat.Json5
             Dim warnings = New List(Of String)(result.Warnings)
             If hasCommentWarning Then
                 warnings.Add(commentWarning)
